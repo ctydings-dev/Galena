@@ -39,9 +39,15 @@ var Terminal = function (canvas) {
             }
 
 
-        }
+        };
 
         this.appendInput(toAdd);
+
+    };
+
+    this.getOutputAt = function (index) {
+
+        return this.getOutput()[index];
 
     };
 
@@ -60,14 +66,14 @@ var Terminal = function (canvas) {
 
         if (genUtils.isNull(this.textRowCount) === true) {
 
-            this.textRowCount = this.getArea().getHeight() / this.getPalette().getTextHeight();
+            this.textRowCount = Math.floor(this.getArea().getHeight() / this.getPalette().getFontHeight());
         }
         return  this.textRowCount;
     };
 
     this.getTextColCount = function () {
         if (genUtils.isNull(this.textColCount) === true) {
-            this.textColCount = this.getArea().getWidth() / this.getPalette().getTextWidth();
+            this.textColCount = Math.floor((this.getArea().getWidth() - this.getColStartPosition()) / this.getPalette().getFontWidth());
         }
         return this.textColCount;
 
@@ -136,7 +142,86 @@ var Terminal = function (canvas) {
         this.setInput(inp);
     };
 
+    this.getRowPosition = function (row) {
+        return  Math.floor(this.getPalette().getTextHeight() * row);
 
+    };
+
+    this.getColStartPosition = function () {
+        return this.colStartPosition;
+    };
+
+    this.colStartPosition = 5;
+
+    this.inputPrefix = '>: ';
+
+    this.getInputPrefix = function () {
+        return this.input.Prefix;
+    };
+
+    this.getFormattedInputLength = function ()
+    {
+        this.getOutputPrefix().length + this.getInputLength();
+
+
+    };
+    this.getFormattedInput = function () {
+
+        return this.getInputPrefix() + this.getInput();
+
+    };
+
+
+
+
+    this.paint = function () {
+
+        var start = 0;
+        this.getArea().clear();
+        this.getArea().setColor(this.getPalette().getBackgroundColor());
+        this.getArea().drawBackground();
+        this.getArea().setColor(this.getPalette().getTextColor());
+        this.getArea().setFont(this.getPalette().getFont());
+        if (this.getOutputSize() > 0) {
+            var rem = this.getTextRowCount() - 1;
+            for (var index = this.getOutputSize(); index >= 0; index--) {
+                if (rem > 0) {
+                    var height = this.getOutputAt(index).getHeight();
+                    rem = rem - height;
+
+                    if (rem > 0) {
+                        start = index;
+                    }
+
+                }
+            }
+        }
+        var yPos = this.getColStartPosition();
+        for (var row = 0; row < this.getTextRowCount() - 1; row++) {
+            var index = row + start;
+
+            if (this.getOutputSize() > index) {
+                var xPos = this.getRowPosition(row);
+                this.getOutputAt(index).draw(xPos, yPos, this.getArea(), this);
+
+
+            }
+
+
+
+        }
+
+        xPos = this.getTextRowCount() - 1;
+        this.getArea().drawText(this.getFormattedInput(), xPos, yPos);
+
+
+
+
+
+
+
+
+    };
 
 
 

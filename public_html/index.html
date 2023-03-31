@@ -5,21 +5,27 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>GALENA TEST</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="./src/GenUtils.js"></script>
         <script src="./src/TerminalArea.js"></script>
         <script src="./src/TerminalPalette.js"></script>
         <script src="./src/Terminal.js"></script>
+
     </head>
     <body>
+        <canvas id="galenaCanvas" width="200" height="100"></canvas>
+
         <script>
-            alert('hello dolly');
+            var canvas = document.getElementById('galenaCanvas');
+
+            var term = new Terminal(canvas);
+            term.paint();
+            alert(term);
 
         </script>
 
 
-        <div>TODO write content</div>
     </body>
 </html>

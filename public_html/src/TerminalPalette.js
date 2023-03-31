@@ -1,5 +1,5 @@
 
-var ColorPalette = function () {
+var TerminalPalette = function () {
 
     this.dayBackgroundColor = '#000000';
     this.dayTextColor = '#FFFFFF';
@@ -33,7 +33,7 @@ var ColorPalette = function () {
 
     this.textFont = '';
 
-    this.getTextFont = function () {
+    this.getFont = function () {
         return this.textFont;
     };
 

@@ -1,6 +1,6 @@
 /* global genUtils */
 
-var terminalCanvas = function (canvas) {
+var TerminalArea = function (canvas) {
 
     this.canvas = canvas;
     this.getCanvas = function () {
@@ -51,6 +51,8 @@ var terminalCanvas = function (canvas) {
     this.drawBackground = function () {
         this.fillRect(0, 0, this.getWidth(), this.getHeight());
     };
+
+
 
 
 
