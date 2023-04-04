@@ -12,6 +12,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <script src="./src/TerminalArea.js"></script>
         <script src="./src/TerminalPalette.js"></script>
         <script src="./src/Terminal.js"></script>
+        <script src="./src/TerminalSystem.js"></script>
+        <script src="./src/KeySet.js"></script>
+
 
     </head>
     <body>
@@ -20,9 +23,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <script>
             var canvas = document.getElementById('galenaCanvas');
 
-            var term = new Terminal(canvas);
-            term.paint();
-            alert(term);
+            var term = new TerminalSystem(canvas);
 
         </script>
 
