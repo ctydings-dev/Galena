@@ -28,7 +28,7 @@ var TerminalArea = function (canvas) {
         return this.height;
     };
     this.setColor = function (toSet) {
-        this.getContext().fillSyle = toSet;
+        this.getContext().fillStyle = toSet;
 
     };
 
@@ -51,14 +51,28 @@ var TerminalArea = function (canvas) {
     this.drawBackground = function () {
         this.fillRect(0, 0, this.getWidth(), this.getHeight());
     };
+//https://www.geeksforgeeks.org/how-to-sharpen-blurry-text-in-html5-canvas/
+    var ctx = canvas.getContext('2d');
+    window.devicePixelRatio = 1; //Blury Text
+    window.devicePixelRatio = 2;      //Clear Text
+    //(CSS pixels).
+    //Display Size
+    var ctx = this.getContext();
+    canvas.style.width = this.getWidth() + "px";
+    canvas.style.height = this.getHeight() + "px";
+
+    var scale = window.devicePixelRatio;
+
+    canvas.width = Math.floor(this.getWidth() * scale);
+    canvas.height = Math.floor(this.getHeight() * scale);
+
+    //CSS pixels for coordinate systems
+    ctx.scale(scale, scale);
+    ctx.font = '10px Courier New';
+
+    ctx.textBaseline = 'middle';
 
 
 
 
-
-
-
-
-
-
-}
+};

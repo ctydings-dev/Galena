@@ -1,8 +1,8 @@
 
 var TerminalPalette = function () {
 
-    this.dayBackgroundColor = '#000000';
-    this.dayTextColor = '#FFFFFF';
+    this.dayBackgroundColor = '#FFFFFF';
+    this.dayTextColor = '#000000';
     this.getDayBackgroundColor = function () {
         return this.dayBackgroundColor;
     };
@@ -31,14 +31,14 @@ var TerminalPalette = function () {
         this.setBackgroundColor(this.getDayBackgroundColor());
     };
 
-    this.textFont = '';
+    this.textFont = '14px Courier New';
 
     this.getFont = function () {
         return this.textFont;
     };
 
     this.getFontHeight = function () {
-        return 10;
+        return 14;
     };
     this.getFontWidth = function () {
         return 10;

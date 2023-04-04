@@ -19,7 +19,7 @@ var KeySet = function () {
         70: 'f',
         71: 'g',
         72: 'h',
-        73: 'I',
+        73: 'i',
         74: 'j',
         75: 'k',
         76: 'l',
@@ -57,7 +57,8 @@ var KeySet = function () {
         188: ',',
         190: '.',
         191: '/',
-        220: '\\'
+        220: '\\',
+        32: ' ',
     };
 
     this.upper = {
@@ -108,6 +109,7 @@ var KeySet = function () {
         190: '>',
         191: '?',
         220: '|',
+        32: ' ',
     };
 
     this.shift = false;
@@ -199,7 +201,10 @@ var KeySet = function () {
             isRight: function () {
                 return false;
             },
-            isEnter = function () {
+            isEnter: function () {
+                return false;
+            },
+            isBackspace: function () {
                 return false;
             }
         };
@@ -270,6 +275,15 @@ var KeySet = function () {
             };
             return ret;
         }
+
+
+        if (code === this.back) {
+            ret.isBackspace = function () {
+                return true;
+            }
+            return ret;
+        }
+
 
         alert(code + ' IS NOT A RECOGNIZED FUNCTION');
 

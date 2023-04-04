@@ -7,6 +7,10 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.getKeySet = function () {
         return this.keySet;
     };
+    this.paint = function () {
+        this.getTerminal().paint();
+    };
+
     this.isVerbose = function () {
         return this.verbose === true;
     };
@@ -29,17 +33,46 @@ var TerminalSystem = function (canvas, useVerbose) {
         var value = this.getKeySet().processDownEvent(event.keyCode);
 
         if (value.furtherProcess() === false) {
+            this.paint();
             return;
         }
 
 
         this.processKey(value);
+        this.paint();
+
+    };
+
+    this.processUpEvent = function (event) {
+        this.getKeySet().processUpEvent(event.keyCode);
+    };
+
+
+
+    this.processCmd = function () {
+        var input = this.getTerminal().getInput();
+        this.getTerminal().addTextOutput(input);
+        this.getTerminal().clearInput();
+
 
     };
 
     this.processKey = function (key) {
+        if (key.isBackspace() === true) {
 
-        alert(key.getValue());
+            this.getTerminal().trimInput();
+            return;
+        }
+
+        if (key.isEnter() === true) {
+            this.processCmd();
+            return;
+        }
+
+
+
+
+        this.getTerminal().appendInput(key.getValue());
 
 
     };
@@ -47,6 +80,9 @@ var TerminalSystem = function (canvas, useVerbose) {
     window.addEventListener("keydown", function () {
         caller.processDownEvent(event);
     });
+    window.addEventListener("keyup", function () {
+        caller.processUpEvent(event);
+    });
 
-
+    this.paint();
 };
