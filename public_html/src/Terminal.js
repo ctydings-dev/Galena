@@ -272,6 +272,11 @@ var Terminal = function (canvas) {
     };
     this.vertLock = false;
 
+    this.getVerticalInputPadding = function () {
+        return this.verticalInputPadding;
+    };
+    this.verticalInputPadding = 2;
+
     this.paint = function () {
 
         var xPos = 5
@@ -284,7 +289,7 @@ var Terminal = function (canvas) {
         this.getArea().setFont(this.getPalette().getFont());
         if (this.getOutputSize() > 0) {
             this.vertLock = false;
-            var rem = this.getTextRowCount() - 3;
+            var rem = this.getTextRowCount() - this.getVerticalInputPadding();
             var total = rem;
             var index = 0;
             var offset = this.getVerticalOffset();

@@ -86,6 +86,7 @@ var TerminalSystem = function (canvas, useVerbose) {
 
         if (key.isEnter() === true) {
             this.processCmd();
+            this.getTerminal().setVerticalOffset(0);
             return;
         }
 
