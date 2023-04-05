@@ -73,6 +73,15 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.getTerminal().decrementVerticalOffset();
             return;
         }
+        if (key.isLeft() === true) {
+            this.getTerminal().incrementHorizontalOffset();
+            return;
+        }
+
+        if (key.isRight() === true) {
+            this.getTerminal().decrementHorizontalOffset();
+            return;
+        }
 
 
         if (key.isEnter() === true) {

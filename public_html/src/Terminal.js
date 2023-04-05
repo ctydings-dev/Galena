@@ -61,6 +61,7 @@ var Terminal = function (canvas) {
         this.addTextOutput("Welcome to the Galena Terminal System(GTS)");
         this.addTextOutput('(c) 2023 Christopher Tydings');
         this.addTextOutput('Version: ' + this.getVersion() + ' : April 4, 2023');
+        this.addTextOutput('');
 
 
 
@@ -130,13 +131,13 @@ var Terminal = function (canvas) {
         return this.horizontalOffset;
     };
     this.setHorizontalOffset = function (toSet) {
-
+        this.updateTime();
         if (genUtils.isInteger(toSet) !== true) {
             throw 'HORIZONTAL INCREMENT MUST BE A POSITIVE INTEGER';
         }
 
-        if (toSet > this.getOutputSize()) {
-            toSet = this.getOutputSize();
+        if (toSet > this.getInputLength()) {
+            toSet = this.getInputLength();
         }
 
         if (toSet < 0) {
@@ -186,7 +187,23 @@ var Terminal = function (canvas) {
         this.setInput('');
     };
     this.appendInput = function (toAdd) {
-        this.setInput(this.getInput() + toAdd);
+
+
+
+        var loc = this.getHorizontalOffset();
+        if (loc === 0) {
+            this.setInput(this.getInput() + toAdd);
+            return;
+        }
+
+
+        loc = this.getInputLength() - loc;
+        var first = this.getInput().substring(0, loc);
+        var second = this.getInput().substring(loc);
+        var toSet = first + toAdd + second;
+
+
+        this.setInput(toSet);
     };
     this.getInputLength = function () {
         return this.getInput().length;
@@ -226,7 +243,7 @@ var Terminal = function (canvas) {
             var ret = this.getInput() + cursor;
             return ret;
         }
-
+        loc = this.getInputLength() - loc;
         var first = this.getInput().substring(0, loc);
         var second = this.getInput().substring(loc);
         return first + cursor + second;
@@ -239,7 +256,7 @@ var Terminal = function (canvas) {
         if (this.displayCursor() === true) {
             end = '_';
         }
-        var len = this.getFormattedInputLength();
+
         if (this.getFormattedInputLength() > this.getTextColCount()) {
 
             var start = this.getTextColCount() - this.getInputPrefix().length - 2;
