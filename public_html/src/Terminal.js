@@ -260,7 +260,7 @@ var Terminal = function (canvas) {
         if (this.getFormattedInputLength() > this.getTextColCount()) {
 
             var start = this.getTextColCount() - this.getInputPrefix().length - 2;
-            start = this.getInputLength() - start;
+            start = this.getInputLength() - start - this.getHorizontalOffset();
             var sub = this.getCursorInput(end).substring(start);
             return this.getInputPrefix() + sub;
 
