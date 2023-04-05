@@ -214,22 +214,50 @@ var Terminal = function (canvas) {
     {
 
 
-        var ret = this.getOutputPrefix().length + this.getInputLength() + 1;
+        var ret = this.getInputPrefix().length + this.getInputLength() + 1;
+        return ret;
     };
+
+    this.getCursorInput = function (cursor) {
+
+        var loc = this.getHorizontalOffset();
+
+        if (loc === 0 || cursor.length < 1) {
+            var ret = this.getInput() + cursor;
+            return ret;
+        }
+
+        var first = this.getInput().substring(0, loc);
+        var second = this.getInput().substring(loc);
+        return first + cursor + second;
+
+
+    };
+
     this.getFormattedInput = function () {
         var end = '';
         if (this.displayCursor() === true) {
             end = '_';
         }
+        var len = this.getFormattedInputLength();
+        if (this.getFormattedInputLength() > this.getTextColCount()) {
+
+            var start = this.getTextColCount() - this.getInputPrefix().length - 2;
+            start = this.getInputLength() - start;
+            var sub = this.getCursorInput(end).substring(start);
+            return this.getInputPrefix() + sub;
+
+        }
 
 
-        return this.getInputPrefix() + this.getInput() + end;
+
+        return this.getInputPrefix() + this.getCursorInput(end);
     };
     this.vertLock = false;
 
     this.paint = function () {
 
-        var xPos = this.getHorizontalOffset();
+        var xPos = 5
         var yPos = 0;
 
         this.getArea().clear();
