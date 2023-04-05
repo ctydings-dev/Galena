@@ -64,6 +64,12 @@ var TerminalSystem = function (canvas, useVerbose) {
             return;
         }
 
+        if (key.isUp() === true) {
+            this.getTerminal().incrementVerticalOffset();
+            return;
+        }
+
+
         if (key.isEnter() === true) {
             this.processCmd();
             return;

@@ -41,6 +41,10 @@ const genUtils = {
         return ('' + toTest.getType()).trim().toUpperCase() === (target + '').trim().toUpperCase();
 
 
+    },
+    getTime: function () {
+        var temp = new Date();
+        return temp.getTime();
     }
 
 
