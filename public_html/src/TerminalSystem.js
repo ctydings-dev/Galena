@@ -17,7 +17,7 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.getModes = function () {
         return this.modes;
     };
-    this.addMode = function (toAdd) {
+    this.addModule = function (toAdd) {
 
         toAdd.caller = this;
         toAdd.getCaller = function () {
@@ -25,6 +25,13 @@ var TerminalSystem = function (canvas, useVerbose) {
         };
         var name = toAdd.getName().trim().toUpperCase();
         this.getModes()[name] = toAdd;
+        if (this.hasMode() === false) {
+            this.setMode(name);
+        }
+
+    };
+    this.hasMode = function () {
+        return genUtils.isNull(this.getMode()) !== true;
     };
     this.executeModeCommand = function (cmd) {
         if (genUtils.isNull(this.getMode) === true) {
@@ -93,7 +100,11 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.getTerminal().clearInput();
             return;
         }
-        this.getTerminal().addTextOutput(input);
+        try {
+            this.executeModeCommand(input);
+        } catch (err) {
+            this.printText(err);
+        }
         this.getTerminal().clearInput();
     };
     this.processKey = function (key) {
@@ -104,11 +115,26 @@ var TerminalSystem = function (canvas, useVerbose) {
         }
 
         if (key.isUp() === true) {
+
+            if (key.isShift() === true) {
+                this.getTerminal().incrementInputIndex();
+                this.getTerminal().setOldInput();
+                return;
+            }
+
             this.getTerminal().incrementVerticalOffset();
             return;
         }
 
         if (key.isDown() === true) {
+            if (key.isShift() === true) {
+                this.getTerminal().decrementInputIndex();
+                this.getTerminal().setOldInput();
+                return;
+            }
+
+
+
             this.getTerminal().decrementVerticalOffset();
             return;
         }
@@ -127,6 +153,7 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.processCmd();
             this.getTerminal().setVerticalOffset(0);
             this.getTerminal().setHorizontalOffset(0);
+            this.getTerminal().oldInputIndex = -1;
             return;
         }
 

@@ -1,36 +1,101 @@
 
 /* global genUtils */
 
-var Terminal = function (canvas) {
+class  Terminal {
 
-    this.area = new TerminalArea(canvas);
-    this.getArea = function () {
+    constructor(canvas) {
+        this.area = new TerminalArea(canvas);
+        this.setup();
+    }
+    getArea = function () {
         return this.area;
-    };
-    this.palette = new TerminalPalette();
-    this.getPalette = function () {
+    }
+    oldInputs = []
+    getOldInputs = function () {
+        return this.oldInputs;
+    }
+    addOldInput = function () {
+        var toAdd = this.getInput().trim();
+
+        if (toAdd.length < 1) {
+            return;
+        }
+
+        this.getOldInputs().push(toAdd);
+        while (this.getOldInputs().length > this.getOutputLimit()) {
+            this.getOldInputs().shift();
+        }
+
+    }
+    oldInputIndex = 0;
+    getOldInputIndex = function () {
+        return this.oldInputIndex;
+    }
+
+    setOldInputIndex = function (toSet) {
+        if (toSet < 0) {
+            this.oldInputIndex = 0;
+            return;
+        }
+        if (toSet >= this.getOldInputs().length) {
+            this.oldInputIndex = this.getOldInputs().length - 1;
+            return;
+        }
+        this.oldInputIndex = toSet;
+
+    }
+
+    incrementInputIndex = function () {
+        this.setOldInputIndex(this.getOldInputIndex() + 1);
+    }
+
+    decrementInputIndex = function () {
+        this.setOldInputIndex(this.getOldInputIndex() - 1);
+    }
+
+    setOldInput = function () {
+
+        if (this.getOldInputIndex() < 0) {
+            return;
+        }
+
+        if (this.getOldInputs().length < 1) {
+            return;
+        }
+
+        this.setInput(this.getOldInputs()[ this.getOldInputs().length - 1 - this.getOldInputIndex()]);
+    }
+
+    palette = new TerminalPalette();
+    getPalette = function () {
         return this.palette;
-    };
-    this.output = [];
-    this.getOutput = function () {
+    }
+
+    output = [];
+    getOutput = function () {
         return this.output;
-    };
-    this.blinkTime = 1500;
-    this.blinkGhost = 1000;
-    this.getBlinkTime = function () {
+    }
+
+    blinkTime = 1500;
+    blinkGhost = 1000;
+    getBlinkTime = function () {
         return this.blinkTime;
-    };
-    this.getBlinkGhost = function () {
+    }
+
+    getBlinkGhost = function () {
         return this.blinkGhost;
-    };
-    this.lastUpdated = 0;
-    this.getLastUpdated = function () {
+    }
+
+    lastUpdated = 0;
+    getLastUpdated = function () {
         return this.lastUpdated;
-    };
-    this.updateTime = function () {
+    }
+
+    updateTime = function () {
         this.lastUpdated = genUtils.getTime();
-    };
-    this.displayCursor = function () {
+    }
+
+    displayCursor = function () {
         var test = genUtils.getTime();
         test = test - this.getLastUpdated();
         if (test <= this.getBlinkGhost())
@@ -40,21 +105,24 @@ var Terminal = function (canvas) {
 
         test = test % this.getBlinkTime();
         return test > this.getBlinkTime() / 2;
-    };
-    this.cursor = '_';
-    this.getCursor = function () {
-        return this.cursor;
-    };
-    this.outputLimit = 50;
-    this.getOutputLimit = function () {
-        return this.outputLimit;
-    };
-    this.version = '0.0.0';
-    this.getVersion = function () {
-        return this.version;
-    };
+    }
 
-    this.addSplash = function (clear) {
+    cursor = '_';
+    getCursor = function () {
+        return this.cursor;
+    }
+
+    outputLimit = 50;
+    getOutputLimit = function () {
+        return this.outputLimit;
+    }
+
+    version = '0.0.0';
+    getVersion = function () {
+        return this.version;
+    }
+
+    addSplash = function (clear) {
         if (clear === true) {
             this.clearOutput();
         }
@@ -65,13 +133,13 @@ var Terminal = function (canvas) {
 
 
 
-    };
+    }
 
-
-    this.getOutputSize = function () {
+    getOutputSize = function () {
         return this.getOutput().length;
-    };
-    this.addTextOutput = function (text) {
+    }
+
+    addTextOutput = function (text) {
         while (text.length > this.getTextColCount()) {
             var sub = text.substring(0, this.getTextColCount());
             text = text.substring(this.getTextColCount());
@@ -95,21 +163,26 @@ var Terminal = function (canvas) {
 
         };
         this.addOutput(toAdd);
-    };
-    this.getOutputAt = function (index) {
+    }
+
+    getOutputAt = function (index) {
 
         return this.getOutput()[index];
-    };
-    this.addOutput = function (toAdd) {
+    }
+
+    addOutput = function (toAdd) {
         this.getOutput().push(toAdd);
         while (this.getOutputSize() > this.getOutputLimit()) {
             this.getOutput().shift();
         }
-    };
-    this.clearOutput = function () {
+    }
+
+    clearOutput = function () {
+
         this.output = [];
-    };
-    this.getTextRowCount = function () {
+    }
+
+    getTextRowCount = function () {
 
         if (genUtils.isNull(this.textRowCount) === true) {
 
@@ -117,20 +190,23 @@ var Terminal = function (canvas) {
                     this.getPalette().getFontHeight());
         }
         return  this.textRowCount;
-    };
-    this.getTextColCount = function () {
+    }
+
+    getTextColCount = function () {
         if (genUtils.isNull(this.textColCount) === true) {
             this.textColCount = Math.floor((this.getArea().getWidth() -
                     this.getColStartPosition()) /
                     this.getPalette().getFontWidth());
         }
         return this.textColCount;
-    };
-    this.horizontalOffset = 0;
-    this.getHorizontalOffset = function () {
+    }
+
+    horizontalOffset = 0;
+    getHorizontalOffset = function () {
         return this.horizontalOffset;
-    };
-    this.setHorizontalOffset = function (toSet) {
+    }
+
+    setHorizontalOffset = function (toSet) {
         this.updateTime();
         if (genUtils.isInteger(toSet) !== true) {
             throw 'HORIZONTAL INCREMENT MUST BE A POSITIVE INTEGER';
@@ -145,18 +221,22 @@ var Terminal = function (canvas) {
         }
 
         this.horizontalOffset = toSet;
-    };
-    this.incrementHorizontalOffset = function () {
+    }
+
+    incrementHorizontalOffset = function () {
         this.setHorizontalOffset(this.getHorizontalOffset() + 1);
-    };
-    this.decrementHorizontalOffset = function () {
+    }
+
+    decrementHorizontalOffset = function () {
         this.setHorizontalOffset(this.getHorizontalOffset() - 1);
-    };
-    this.verticalOffset = 0;
-    this.getVerticalOffset = function () {
+    }
+
+    verticalOffset = 0;
+    getVerticalOffset = function () {
         return this.verticalOffset;
-    };
-    this.setVerticalOffset = function (toSet) {
+    }
+
+    setVerticalOffset = function (toSet) {
         if (toSet > this.getVerticalOffset()) {
             if (this.vertLock === true) {
                 return;
@@ -167,26 +247,33 @@ var Terminal = function (canvas) {
             toSet = 0;
         }
         this.verticalOffset = toSet;
-    };
-    this.incrementVerticalOffset = function () {
+    }
+
+    incrementVerticalOffset = function () {
         this.setVerticalOffset(this.getVerticalOffset() + 1);
-    };
-    this.decrementVerticalOffset = function () {
+    }
+
+    decrementVerticalOffset = function () {
         this.setVerticalOffset(this.getVerticalOffset() - 1);
-    };
-    this.input = '';
-    this.getInput = function () {
+    }
+
+    input = '';
+    getInput = function () {
         return this.input;
-    };
-    this.setInput = function (toSet) {
+    }
+
+    setInput = function (toSet) {
 
         this.updateTime();
         this.input = toSet;
-    };
-    this.clearInput = function () {
+    }
+
+    clearInput = function () {
+        this.addOldInput();
         this.setInput('');
-    };
-    this.appendInput = function (toAdd) {
+    }
+
+    appendInput = function (toAdd) {
 
 
 
@@ -204,38 +291,53 @@ var Terminal = function (canvas) {
 
 
         this.setInput(toSet);
-    };
-    this.getInputLength = function () {
+    }
+
+    getInputLength = function () {
         return this.getInput().length;
-    };
-    this.trimInput = function () {
+    }
+
+    trimInput = function () {
         var len = this.getInputLength();
         if (len < 1) {
             return;
         }
-        var inp = this.getInput().substring(0, len - 1);
-        this.setInput(inp);
-    };
-    this.getRowPosition = function (row) {
+        if (this.getHorizontalOffset() === 0) {
+            var inp = this.getInput().substring(0, len - 1);
+            this.setInput(inp);
+            return;
+        }
+        len = this.getHorizontalOffset();
+        len = this.getInput().length - len;
+        var first = this.getInput().substring(0, len - 1);
+        var second = this.getInput().substring(len);
+        this.setInput(first + second);
+
+    }
+
+    getRowPosition = function (row) {
         return  Math.floor(this.getPalette().getFontHeight() * row + this.getPalette().getFontHeight() / 2);
-    };
-    this.getColStartPosition = function () {
+    }
+
+    getColStartPosition = function () {
         return this.colStartPosition;
-    };
-    this.colStartPosition = 5;
-    this.inputPrefix = '>: ';
-    this.getInputPrefix = function () {
+    }
+
+    colStartPosition = 5;
+    inputPrefix = '>: ';
+    getInputPrefix = function () {
         return this.inputPrefix;
-    };
-    this.getFormattedInputLength = function ()
+    }
+
+    getFormattedInputLength = function ()
     {
 
 
         var ret = this.getInputPrefix().length + this.getInputLength() + 1;
         return ret;
-    };
+    }
 
-    this.getCursorInput = function (cursor) {
+    getCursorInput = function (cursor) {
 
         var loc = this.getHorizontalOffset();
 
@@ -249,9 +351,9 @@ var Terminal = function (canvas) {
         return first + cursor + second;
 
 
-    };
+    }
 
-    this.getFormattedInput = function () {
+    getFormattedInput = function () {
         var end = '';
         if (this.displayCursor() === true) {
             end = '_';
@@ -269,15 +371,16 @@ var Terminal = function (canvas) {
 
 
         return this.getInputPrefix() + this.getCursorInput(end);
-    };
-    this.vertLock = false;
+    }
 
-    this.getVerticalInputPadding = function () {
+    vertLock = false;
+
+    getVerticalInputPadding = function () {
         return this.verticalInputPadding;
-    };
-    this.verticalInputPadding = 2;
+    }
 
-    this.paint = function () {
+    verticalInputPadding = 2;
+    paint = function () {
 
         var xPos = 5
         var yPos = 0;
@@ -339,10 +442,13 @@ var Terminal = function (canvas) {
         }
         yPos = this.getRowPosition(this.getTextRowCount() - 1);
         this.getArea().drawText(this.getFormattedInput(), xPos, yPos);
-    };
-    var caller = this;
-    setInterval(function () {
-        caller.paint();
-    }, 20);
-    this.addSplash();
-};
+    }
+
+    setup = function () {
+        var caller = this;
+        setInterval(function () {
+            caller.paint();
+        }, 20);
+        this.addSplash();
+    }
+}

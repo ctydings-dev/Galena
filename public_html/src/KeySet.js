@@ -82,7 +82,7 @@ var KeySet = function () {
         82: 'R',
         83: 'S',
         84: 'T',
-        85: 'upper',
+        85: 'U',
         86: 'V',
         87: 'W',
         88: 'X',
@@ -160,6 +160,10 @@ var KeySet = function () {
             value: null,
             alt: this.isAlt(),
             cntrl: this.isCntrl(),
+            shift: this.isShift(),
+            isShift: function () {
+                return this.shift;
+            },
             isAlt: function () {
                 return this.alt === true;
             },
