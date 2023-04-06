@@ -45,6 +45,25 @@ const genUtils = {
     getTime: function () {
         var temp = new Date();
         return temp.getTime();
+    },
+    breakupString: function (input, delim) {
+        var ret = [];
+        var index = input.indexOf(delim);
+        while (index >= 0) {
+            var sub = input.substring(0, index);
+            if (sub.length > 1) {
+                ret.push(sub);
+            }
+            input = input.substring(index + delim.length);
+            index = input.indexOf(delim);
+
+        }
+        if (input.length > 0) {
+            ret.push(input);
+        }
+
+
+        return ret;
     }
 
 
