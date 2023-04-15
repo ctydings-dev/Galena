@@ -72,7 +72,7 @@ class TextTable {
 
     setCell = function (row, col, value) {
 
-        this.getRow(row)[col] = value;
+        this.getRow(row)[col] = value + '';
     }
 
     getCellLength = function (row, col) {
