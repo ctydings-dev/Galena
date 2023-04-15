@@ -117,7 +117,7 @@ class  Terminal {
         return this.outputLimit;
     }
 
-    version = '0.0.0';
+    version = '0.0.1';
     getVersion = function () {
         return this.version;
     }
@@ -128,7 +128,7 @@ class  Terminal {
         }
         this.addTextOutput("Welcome to the Galena Terminal System(GTS)");
         this.addTextOutput('(c) 2023 Christopher Tydings');
-        this.addTextOutput('Version: ' + this.getVersion() + ' : April 4, 2023');
+        this.addTextOutput('Version: ' + this.getVersion() + ' : April 14, 2023');
         this.addTextOutput('');
 
 

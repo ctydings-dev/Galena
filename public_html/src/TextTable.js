@@ -156,10 +156,11 @@ class TextTable {
         }
 
 
-        for (var x = 0; x < lens.length; x++) {
+        for (var x = 0; x < lens.cols.length; x++) {
 
             ret[x] = lens.cols[x].ratio * length;
-            if (ret[x] < 0) {
+            ret[x] = Math.floor(ret[x]);
+            if (ret[x] < 1) {
                 ret[x] = 1;
             }
 
@@ -232,7 +233,7 @@ class TextTable {
         while (data.length > length) {
             var sub = data.substring(0, length);
             data = data.substring(length);
-            ret = [col].push(sub);
+            ret[col].push(sub);
             counter++;
 
         }
@@ -297,7 +298,7 @@ class TextTable {
 
         var parsed = [];
         parsed.push(this.createHorizontalRow(lens));
-
+        var titleLen = 1;
         for (var row = -1; row < this.getRowCount(); row++) {
 
             var toParse = this.getColumns();
@@ -305,9 +306,11 @@ class TextTable {
                 toParse = this.getRow(row);
             }
             var toAdd = this.rowToText(toParse, lens);
+
             this.addRowData(parsed, toAdd);
-
-
+            if (row === -1) {
+                titleLen = toAdd[0].length;
+            }
 
         }
         var ret = [];
@@ -321,7 +324,7 @@ class TextTable {
         for (var row = 1; row < parsed.length; row++) {
 
             ret.push(this.rowToString(parsed[row], delim));
-            if (row === 1) {
+            if (row === titleLen) {
 
                 ret.push(this.rowToString(parsed[0], this.getAxis()));
 

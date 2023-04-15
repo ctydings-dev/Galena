@@ -164,7 +164,9 @@ var TerminalSystem = function (canvas, useVerbose) {
 
     this.printTable = function (table) {
 
-
+        var len = this.getTerminal().getTextColCount();
+        var out = table.toArray(len);
+        this.printArray(out);
 
 
     };
