@@ -248,6 +248,38 @@ var TerminalSystem = function (canvas, useVerbose) {
             return;
         }
 
+
+        if (broken[0] === 'NIGHT') {
+
+
+
+            this.getTerminal().getPalette().setNightColors();
+
+
+
+
+            return;
+        }
+
+        if (broken[0] === 'DAY') {
+
+
+
+            this.getTerminal().getPalette().setDayColors();
+
+
+
+
+            return;
+        }
+
+
+
+
+
+
+
+
         if (broken[0] === 'CLEAR') {
             this.getTerminal().addSplash(true);
             if (broken[1] === 'ALL') {

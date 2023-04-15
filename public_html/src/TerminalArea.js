@@ -16,32 +16,36 @@ class TerminalArea {
         }
         return this.context;
     }
-    ;
-            getWidth = function () {
-                if (genUtils.isNull(this.width) === true) {
-                    this.width = this.getCanvas().getBoundingClientRect().width;
-                }
 
-                return this.width;
-            }
-    ;
-            getHeight = function () {
-                if (genUtils.isNull(this.height) === true) {
-                    this.height = this.getCanvas().getBoundingClientRect().height;
-                }
-                return this.height;
-            }
-    ;
-            setColor = function (toSet) {
-                this.getContext().fillStyle = toSet;
+    getWidth = function () {
+        if (genUtils.isNull(this.width) === true) {
+            this.width = this.getCanvas().getBoundingClientRect().width;
+        }
 
-            }
-    ;
-            setFont = function (toSet) {
-                this.getContext().font = toSet;
-            }
+        return this.width;
+    }
+
+    getHeight = function () {
+        if (genUtils.isNull(this.height) === true) {
+            this.height = this.getCanvas().getBoundingClientRect().height;
+        }
+        return this.height;
+    }
+
+    setColor = function (toSet) {
+        this.getContext().fillStyle = toSet;
+
+        this.getContext().strokeStyle = toSet;
+    }
+
+    setFont = function (toSet) {
+
+        this.getContext().font = toSet;
+
+    }
 
     drawText = function (text, x, y) {
+
         this.getContext().strokeText(text, x, y);
     }
 

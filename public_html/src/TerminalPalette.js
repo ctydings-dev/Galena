@@ -3,6 +3,12 @@ var TerminalPalette = function () {
 
     this.dayBackgroundColor = '#FFFFFF';
     this.dayTextColor = '#000000';
+
+
+    this.nightBackgroundColor = '#2c333d';
+    this.nightTextColor = '#5bc7a0';
+
+
     this.getDayBackgroundColor = function () {
         return this.dayBackgroundColor;
     };
@@ -10,9 +16,26 @@ var TerminalPalette = function () {
         return this.dayTextColor;
     };
 
+    this.getNightBackgroundColor = function () {
+        return this.nightBackgroundColor;
+    };
+
+    this.getNightTextColor = function () {
+        return this.nightTextColor;
+    };
+
+
+
     this.getBackgroundColor = function () {
         return this.backgroundColor;
     };
+
+
+
+
+
+
+
 
     this.setBackgroundColor = function (toSet) {
         this.backgroundColor = toSet;
@@ -31,6 +54,12 @@ var TerminalPalette = function () {
         this.setBackgroundColor(this.getDayBackgroundColor());
     };
 
+    this.setNightColors = function () {
+
+        this.setTextColor(this.getNightTextColor());
+        this.setBackgroundColor(this.getNightBackgroundColor());
+    };
+
     this.textFont = '14px Courier New';
 
     this.getFont = function () {
@@ -47,8 +76,6 @@ var TerminalPalette = function () {
 
 
     this.setDayColors();
-
-
 
 
 
