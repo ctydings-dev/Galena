@@ -14,16 +14,42 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <script src="./src/Terminal.js"></script>
         <script src="./src/TerminalSystem.js"></script>
         <script src="./src/KeySet.js"></script>
-
-
+        <script src="./src/BaseModule.js"></script>
+        <script src="./src/SQLModule.js"></script>
+        <script src="./src/TextTable.js"></script>
+        <script src="./lib/sql-asm.js"></script>
     </head>
     <body>
         <canvas id="galenaCanvas" width="600" height="350"></canvas>
 
         <script>
+
             var canvas = document.getElementById('galenaCanvas');
 
             var term = new TerminalSystem(canvas);
+
+            config = {
+                locateFile: filename => `/dist/${filename}`
+            }
+            initSqlJs(config).then(function (SQL) {
+                //Create the database
+                var mod = new SQLModule(SQL);
+                term.addModule(mod);
+                var cmd = '';
+
+                cmd = 'CREATE TABLE test(id INTEGER PRIMARY KEY, text VARCHAR(32)); ';
+                mod.execute(cmd);
+                cmd = 'INSERT INTO test(text) VALUES ("HELLO DOLLY");';
+
+                mod.execute(cmd);
+
+
+
+            });
+
+
+
+
 
         </script>
 
