@@ -211,6 +211,9 @@ var KeySet = function () {
             },
             isBackspace: function () {
                 return false;
+            },
+            isUnknown: function () {
+                return false;
             }
         };
 
@@ -296,10 +299,12 @@ var KeySet = function () {
             return ret;
         }
 
+        ret.value = code;
+        ret.isUnknown = function () {
+            return true;
+        }
 
-
-
-        alert(code + ' IS NOT A RECOGNIZED FUNCTION');
+        return ret;
 
 
 

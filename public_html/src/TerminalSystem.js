@@ -69,6 +69,14 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.processDownEvent = function (event) {
 
         var value = this.getKeySet().processDownEvent(event.keyCode);
+
+        if (value.isUnknown() === true) {
+
+            this.printText(value.getValue() + ' is not a recognized key!');
+            this.paint();
+            return;
+        }
+
         if (value.furtherProcess() === false) {
             this.paint();
             return;
@@ -179,6 +187,22 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.printText(toPrint[index] + '');
         }
 
+    };
+
+    this.downloadToLocal = function (data, fileName) {
+
+        var file = new Blob(data, {
+            type: 'text'
+        });
+        var fileURL = URL.createObjectURL(file);
+// create an anchor and click on it.
+        var anchorTag = document.createElement('a');
+        anchorTag.href = fileURL;
+        anchorTag.target = '_blank';
+        anchorTag.download = fileName;
+        document.body.appendChild(anchorTag);
+        anchorTag.click();
+        document.body.removeChild(anchorTag);
     };
 
 

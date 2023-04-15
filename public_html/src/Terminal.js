@@ -126,7 +126,7 @@ class  Terminal {
         if (clear === true) {
             this.clearOutput();
         }
-        this.addTextOutput("Welcome to the Galena Terminal System(GTS)");
+        this.addTextOutput("Welcome to the Galena Terminal System(GTS)!");
         this.addTextOutput('(c) 2023 Christopher Tydings');
         this.addTextOutput('Version: ' + this.getVersion() + ' : April 14, 2023');
         this.addTextOutput('');
