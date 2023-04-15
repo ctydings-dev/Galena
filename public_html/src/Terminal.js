@@ -377,12 +377,17 @@ class  Terminal {
 
     getVerticalInputPadding = function () {
         return this.verticalInputPadding;
+
+    }
+    borderPadding = 5;
+    getBorderPadding = function () {
+        return this.borderPadding;
     }
 
     verticalInputPadding = 2;
     paint = function () {
 
-        var xPos = 5
+        var xPos = 8;
         var yPos = 0;
 
         this.getArea().clear();
@@ -426,7 +431,7 @@ class  Terminal {
 
                 if (len <= rem) {
                     rem -= len;
-                    yPos = this.getRowPosition(counter);
+                    yPos = this.getRowPosition(counter) + this.getBorderPadding();
                     this.getOutputAt(index).draw(xPos, yPos, this.getArea(), this);
 
                 } else
