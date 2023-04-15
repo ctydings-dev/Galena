@@ -161,6 +161,25 @@ var TerminalSystem = function (canvas, useVerbose) {
 
         this.getTerminal().appendInput(key.getValue());
     };
+
+    this.printTable = function (table) {
+
+
+
+
+    };
+
+
+    this.printArray = function (toPrint) {
+
+
+        for (var index = 0; index < toPrint.length; index++) {
+            this.printText(toPrint[index] + '');
+        }
+
+    };
+
+
     this.executeSystemCommand = function (input) {
         this.getTerminal().clearInput();
         if (input.length < 1) {
@@ -184,7 +203,8 @@ var TerminalSystem = function (canvas, useVerbose) {
         if (broken[0] === 'MODE')
         {
             if (broken.length < 2) {
-                this.printVerbose('No mode provided!');
+                this.printText('The mode is : ' + this.getMode());
+
                 return;
             }
 

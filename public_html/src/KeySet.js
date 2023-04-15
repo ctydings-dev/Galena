@@ -10,6 +10,7 @@ var KeySet = function () {
     this.right = 39;
     this.down = 40;
     this.back = 8;
+    this.del = 46;
     this.lower = {
         65: 'a',
         66: 'b',
@@ -287,6 +288,15 @@ var KeySet = function () {
             }
             return ret;
         }
+
+        if (code === this.del) {
+            ret.isBackspace = function () {
+                return true;
+            }
+            return ret;
+        }
+
+
 
 
         alert(code + ' IS NOT A RECOGNIZED FUNCTION');
