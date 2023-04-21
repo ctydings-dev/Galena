@@ -1,4 +1,10 @@
-/* global genUtils */
+/**
+ * Galena Terminal System(GTS) Distribution File
+ * (c) 2023 Christopher Tydings 
+ */
+
+
+
 
 class TerminalArea {
 
@@ -70,7 +76,7 @@ class TerminalArea {
         //Display Size
         var ctx = this.getContext();
         this.getCanvas().style.width = this.getWidth() + "px";
-        canvas.style.height = this.getHeight() + "px";
+        //  canvas.style.height = this.getHeight() + "px";
 
         var scale = window.devicePixelRatio;
 
@@ -639,7 +645,7 @@ var KeySet = function () {
         190: '.',
         191: '/',
         220: '\\',
-        32: ' ',
+        32: ' '
     };
 
     this.upper = {
@@ -690,7 +696,7 @@ var KeySet = function () {
         190: '>',
         191: '?',
         220: '|',
-        32: ' ',
+        32: ' '
     };
 
     this.shift = false;
@@ -771,9 +777,7 @@ var KeySet = function () {
             hasValue: function () {
                 return genUtils.isNull(this.getValue()) === false;
             },
-            isAlt: function () {
-                return false;
-            },
+
             isUp: function () {
                 return false;
             },
@@ -868,21 +872,21 @@ var KeySet = function () {
         if (code === this.back) {
             ret.isBackspace = function () {
                 return true;
-            }
+            };
             return ret;
         }
 
         if (code === this.del) {
             ret.isBackspace = function () {
                 return true;
-            }
+            };
             return ret;
         }
 
         ret.value = code;
         ret.isUnknown = function () {
             return true;
-        }
+        };
 
         return ret;
 
@@ -1571,7 +1575,7 @@ class  Terminal {
 ;
 
 
-/* global genUtils */
+/* global genUtils, URL */
 
 class TextTable {
 
@@ -1683,7 +1687,7 @@ class TextTable {
         var grandMax = 0;
         for (var col = 0; col < lens[0].length; col++) {
             var max = 0;
-            var total = 0
+            var total = 0;
             for (var row = 0; row < lens.length; row++) {
                 var value = lens[row][col];
                 if (max < value) {
