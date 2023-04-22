@@ -112,7 +112,7 @@ class  Terminal {
         return this.cursor;
     }
 
-    outputLimit = 50;
+    outputLimit = 500;
     getOutputLimit = function () {
         return this.outputLimit;
     }
@@ -150,7 +150,7 @@ class  Terminal {
             this.addTextOutput(sub);
         }
 
-        var gross = this.getPalette().getFontHeight()
+        var gross = this.getPalette().getFontHeight() * 1.0;
         var toAdd = {
             value: text,
             getValue: function () {
@@ -191,11 +191,11 @@ class  Terminal {
 
     calculateIdealHeight = function () {
 
-        var ret = this.getVerticalInputPadding() * 2;
+        var ret = this.getVerticalInputPadding() * 2 * this.getPalette().getFontHeight();
 
 
-
-        for (var index in this.getOutput()) {
+        for (var index = 0; index < this.getOutput().length; index++)
+        {
 
             ret += this.getOutput()[index].getGrossHeight();
 
@@ -209,6 +209,8 @@ class  Terminal {
     setCanvas = function (toSet, width, height) {
 
         this.getArea().setCanvas(toSet, width, height);
+        this.textRowCount = null;
+        this.textColCount = null;
 
     }
 
