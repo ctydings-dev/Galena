@@ -1,6 +1,7 @@
 /**
  * Galena Terminal System(GTS) Distribution File
  * (c) 2023 Christopher Tydings
+ * Dist Creation Timestamp : 2023-04-22_01-19-47
  */
 
 const genUtils = {
@@ -255,8 +256,17 @@ class TerminalArea {
     setFont = function (toSet) {
         this.getContext().font = toSet;
     }
+    getTextMode = function () {
+        return this.textMode;
+    }
+    textMode = 3;
     drawText = function (text, x, y) {
-        this.getContext().strokeText(text, x, y);
+        if (this.getTextMode() % 2 === 1) {
+            this.getContext().fillText(text, x, y);
+        }
+        if (this.getTextMode() > 1) {
+            this.getContext().strokeText(text, x, y);
+        }
     }
     clear = function () {
         this.getContext().clearRect(0, 0, this.getWidth(), this.getHeight());
@@ -271,7 +281,7 @@ class TerminalArea {
     setup = function () {
         var ctx = this.getCanvas().getContext('2d');
         window.devicePixelRatio = 1; //Blury Text
-        window.devicePixelRatio = 2;      //Clear Text
+        window.devicePixelRatio = 2; //Clear Text
         //(CSS pixels).
         //Display Size
         var ctx = this.getContext();
@@ -322,8 +332,17 @@ class TerminalArea {
     setFont = function (toSet) {
         this.getContext().font = toSet;
     }
+    getTextMode = function () {
+        return this.textMode;
+    }
+    textMode = 3;
     drawText = function (text, x, y) {
-        this.getContext().strokeText(text, x, y);
+        if (this.getTextMode() % 2 === 1) {
+            this.getContext().fillText(text, x, y);
+        }
+        if (this.getTextMode() > 1) {
+            this.getContext().strokeText(text, x, y);
+        }
     }
     clear = function () {
         this.getContext().clearRect(0, 0, this.getWidth(), this.getHeight());
@@ -338,7 +357,7 @@ class TerminalArea {
     setup = function () {
         var ctx = this.getCanvas().getContext('2d');
         window.devicePixelRatio = 1; //Blury Text
-        window.devicePixelRatio = 2;      //Clear Text
+        window.devicePixelRatio = 2; //Clear Text
         //(CSS pixels).
         //Display Size
         var ctx = this.getContext();
@@ -503,6 +522,9 @@ class  Terminal {
     clearOutput = function () {
         this.output = [];
     }
+    getPNG = function () {
+        return  this.getArea().getCanvas().toDataURL('image/png');
+    }
     getTextRowCount = function () {
         if (genUtils.isNull(this.textRowCount) === true) {
             this.textRowCount = Math.floor((this.getArea().getHeight() - this.getPalette().getFontHeight() / 2) /
@@ -862,6 +884,9 @@ class  Terminal {
     clearOutput = function () {
         this.output = [];
     }
+    getPNG = function () {
+        return  this.getArea().getCanvas().toDataURL('image/png');
+    }
     getTextRowCount = function () {
         if (genUtils.isNull(this.textRowCount) === true) {
             this.textRowCount = Math.floor((this.getArea().getHeight() - this.getPalette().getFontHeight() / 2) /
@@ -1227,6 +1252,16 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.printText(toPrint[index] + '');
         }
     };
+    this.downloadImageToLocal = function (fileName) {
+        var data = this.getTerminal().getPNG();
+        var anchorTag = document.createElement('a');
+        anchorTag.href = data;
+        anchorTag.target = '_blank';
+        anchorTag.download = fileName;
+        document.body.appendChild(anchorTag);
+        anchorTag.click();
+        document.body.removeChild(anchorTag);
+    };
     this.downloadToLocal = function (data, fileName) {
         var file = new Blob(data, {
             type: 'text'
@@ -1256,6 +1291,18 @@ var TerminalSystem = function (canvas, useVerbose) {
         }
         if (broken.length < 1) {
             this.printText('No command was given!');
+            return;
+        }
+        if (broken[0] === 'MODES') {
+            this.printText('Registered modes:');
+            for (var mode in this.getModes()) {
+                if (this.getMode() === mode) {
+                    this.printText('   ' + mode + ' <-CURRENT');
+                } else
+                {
+                    this.printText('   ' + mode);
+                }
+            }
             return;
         }
         if (broken[0] === 'MODE')
@@ -1289,10 +1336,23 @@ save function!');
             this.downloadToLocal([out], fileName);
             return;
         }
+        if (broken[0] === 'IMAGE') {
+            if (broken.length !== 2) {
+                this.printText('A file name must be provided for the \n\
+save function!');
+                return;
+            }
+            var out = '';
+            var output = this.getTerminal().getOutput();
+            for (var index = 0; index < output.length; index++) {
+                out = out + output[index].getValue() + '\n';
+            }
+            var fileName = broken[1];
+            this.downloadImageToLocal(fileName);
+            return;
+        }
         if (broken[0] === 'FONT')
         {
-            if (broken[0] === 'NIGHT') {
-            }
             this.getTerminal().getPalette().setNightColors();
             var font = '';
             for (var index = 1; index < broken.length; index++) {
@@ -1483,6 +1543,16 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.printText(toPrint[index] + '');
         }
     };
+    this.downloadImageToLocal = function (fileName) {
+        var data = this.getTerminal().getPNG();
+        var anchorTag = document.createElement('a');
+        anchorTag.href = data;
+        anchorTag.target = '_blank';
+        anchorTag.download = fileName;
+        document.body.appendChild(anchorTag);
+        anchorTag.click();
+        document.body.removeChild(anchorTag);
+    };
     this.downloadToLocal = function (data, fileName) {
         var file = new Blob(data, {
             type: 'text'
@@ -1512,6 +1582,18 @@ var TerminalSystem = function (canvas, useVerbose) {
         }
         if (broken.length < 1) {
             this.printText('No command was given!');
+            return;
+        }
+        if (broken[0] === 'MODES') {
+            this.printText('Registered modes:');
+            for (var mode in this.getModes()) {
+                if (this.getMode() === mode) {
+                    this.printText('   ' + mode + ' <-CURRENT');
+                } else
+                {
+                    this.printText('   ' + mode);
+                }
+            }
             return;
         }
         if (broken[0] === 'MODE')
@@ -1545,10 +1627,23 @@ save function!');
             this.downloadToLocal([out], fileName);
             return;
         }
+        if (broken[0] === 'IMAGE') {
+            if (broken.length !== 2) {
+                this.printText('A file name must be provided for the \n\
+save function!');
+                return;
+            }
+            var out = '';
+            var output = this.getTerminal().getOutput();
+            for (var index = 0; index < output.length; index++) {
+                out = out + output[index].getValue() + '\n';
+            }
+            var fileName = broken[1];
+            this.downloadImageToLocal(fileName);
+            return;
+        }
         if (broken[0] === 'FONT')
         {
-            if (broken[0] === 'NIGHT') {
-            }
             this.getTerminal().getPalette().setNightColors();
             var font = '';
             for (var index = 1; index < broken.length; index++) {
@@ -1818,14 +1913,10 @@ var KeySet = function () {
             return ret;
         }
         if (code === this.altKey) {
-            this.altAlt();
-            ret.alt = this.isAlt();
             ret.process = false;
             return ret;
         }
         if (code === this.cntrlKey) {
-            this.altCntrl();
-            ret.cntrl = this.isCntrl();
             ret.process = false;
             return ret;
         }
@@ -2113,14 +2204,10 @@ var KeySet = function () {
             return ret;
         }
         if (code === this.altKey) {
-            this.altAlt();
-            ret.alt = this.isAlt();
             ret.process = false;
             return ret;
         }
         if (code === this.cntrlKey) {
-            this.altCntrl();
-            ret.cntrl = this.isCntrl();
             ret.process = false;
             return ret;
         }
@@ -2220,7 +2307,7 @@ class SQLModule extends BaseModule {
         this.cmdCounter = 0;
     }
     needReset = function () {
-        return this.getCmdCounter >= this.getCmdResetThreshold();
+        return this.getCmdCounter() >= this.getCmdResetThreshold();
     }
     getSource = function () {
         return this.source;
@@ -2284,7 +2371,10 @@ class SQLModule extends BaseModule {
         }
         return false;
     }
-    execute = function (cmd) {
+    execute = function (cmd, print) {
+        if (genUtils.isNull(print) === true) {
+            print = true;
+        }
         if (this.moduleCmd(cmd) === true) {
             return;
         }
@@ -2292,7 +2382,9 @@ class SQLModule extends BaseModule {
         if (this.needReset() === true) {
             this.reloadDB();
         }
-        this.getCaller().printText(cmd);
+        if (print === true) {
+            this.getCaller().printText(cmd);
+        }
         const stmt = this.getDatabase().prepare(cmd);
         stmt.getAsObject(); // {col1:1, col2:111}
         // Bind new values
@@ -2319,7 +2411,9 @@ class SQLModule extends BaseModule {
         if (genUtils.isNull(table) !== true) {
             this.getCaller().printTable(table);
         }
-        this.getCaller().printText('');
+        if (print === true) {
+            this.getCaller().printText('');
+        }
     }
 }
 
@@ -2344,7 +2438,7 @@ class SQLModule extends BaseModule {
         this.cmdCounter = 0;
     }
     needReset = function () {
-        return this.getCmdCounter >= this.getCmdResetThreshold();
+        return this.getCmdCounter() >= this.getCmdResetThreshold();
     }
     getSource = function () {
         return this.source;
@@ -2408,7 +2502,10 @@ class SQLModule extends BaseModule {
         }
         return false;
     }
-    execute = function (cmd) {
+    execute = function (cmd, print) {
+        if (genUtils.isNull(print) === true) {
+            print = true;
+        }
         if (this.moduleCmd(cmd) === true) {
             return;
         }
@@ -2416,7 +2513,9 @@ class SQLModule extends BaseModule {
         if (this.needReset() === true) {
             this.reloadDB();
         }
-        this.getCaller().printText(cmd);
+        if (print === true) {
+            this.getCaller().printText(cmd);
+        }
         const stmt = this.getDatabase().prepare(cmd);
         stmt.getAsObject(); // {col1:1, col2:111}
         // Bind new values
@@ -2443,7 +2542,9 @@ class SQLModule extends BaseModule {
         if (genUtils.isNull(table) !== true) {
             this.getCaller().printTable(table);
         }
-        this.getCaller().printText('');
+        if (print === true) {
+            this.getCaller().printText('');
+        }
     }
 }
 
