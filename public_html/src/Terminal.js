@@ -3,9 +3,11 @@
 
 class  Terminal {
 
-    constructor(canvas) {
+    constructor(canvas, skipSetup) {
         this.area = new TerminalArea(canvas);
-        this.setup();
+        if (skipSetup !== true) {
+            this.setup();
+        }
     }
     getArea = function () {
         return this.area;
@@ -148,14 +150,18 @@ class  Terminal {
             this.addTextOutput(sub);
         }
 
-
+        var gross = this.getPalette().getFontHeight()
         var toAdd = {
             value: text,
             getValue: function () {
                 return this.value;
             },
+            gross: gross,
             getHeight: function () {
                 return 1;
+            },
+            getGrossHeight: function () {
+                return this.gross;
             },
             draw: function (xPos, yPos, area, caller) {
                 area.drawText(this.getValue(), xPos, yPos);
@@ -183,9 +189,63 @@ class  Terminal {
         this.output = [];
     }
 
-    getPNG = function () {
+    calculateIdealHeight = function () {
 
-        return  this.getArea().getCanvas().toDataURL('image/png');
+        var ret = this.getVerticalInputPadding() * 2;
+
+
+
+        for (var index in this.getOutput()) {
+
+            ret += this.getOutput()[index].getGrossHeight();
+
+        }
+
+
+
+        return ret;
+    }
+
+    setCanvas = function (toSet, width, height) {
+
+        this.getArea().setCanvas(toSet, width, height);
+
+    }
+
+    getPNG = function () {
+        var oldCanvas = this.getArea().getCanvas();
+
+
+
+
+        var canvas = document.createElement('canvas');
+
+
+        var idealHeight = this.calculateIdealHeight();
+        canvas.width = this.getArea().getWidth();
+        canvas.height = idealHeight;
+        canvas.style.zIndex = 8;
+        canvas.style.position = "absolute";
+        canvas.style.border = "1px solid";
+
+
+
+
+
+        this.setCanvas(canvas, canvas.width, idealHeight);
+
+        this.paint();
+
+
+
+
+        var ret = this.getArea().getCanvas().toDataURL('image/png');
+
+
+
+        this.setCanvas(oldCanvas);
+
+        return ret;
     }
 
     getTextRowCount = function () {

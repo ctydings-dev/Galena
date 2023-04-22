@@ -4,7 +4,16 @@ class TerminalArea {
 
     constructor(canvas) {
         this.canvas = canvas;
-        this.setup();
+        // this.setup();
+    }
+
+    setCanvas = function (toSet, width, height) {
+        this.canvas = toSet;
+        this.context = null;
+        this.width = width;
+        this.height = height;
+
+
     }
 
     getCanvas = function () {
