@@ -261,14 +261,13 @@ var KeySet = function () {
             return ret;
         }
         if (code === this.altKey) {
-            this.altAlt();
-            ret.alt = this.isAlt();
+
             ret.process = false;
             return ret;
         }
         if (code === this.cntrlKey) {
-            this.altCntrl();
-            ret.cntrl = this.isCntrl();
+
+
             ret.process = false;
             return ret;
         }

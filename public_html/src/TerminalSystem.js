@@ -189,7 +189,28 @@ var TerminalSystem = function (canvas, useVerbose) {
 
     };
 
+    this.downloadImageToLocal = function (fileName) {
+
+
+        var data = this.getTerminal().getPNG();
+        var anchorTag = document.createElement('a');
+        anchorTag.href = data;
+        anchorTag.target = '_blank';
+        anchorTag.download = fileName;
+        document.body.appendChild(anchorTag);
+        anchorTag.click();
+        document.body.removeChild(anchorTag);
+
+    };
+
+
+
+
+
     this.downloadToLocal = function (data, fileName) {
+
+
+
 
         var file = new Blob(data, {
             type: 'text'
@@ -225,6 +246,29 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.printText('No command was given!');
             return;
         }
+
+
+        if (broken[0] === 'MODES') {
+
+            this.printText('Registered modes:');
+            for (var mode in this.getModes()) {
+
+                if (this.getMode() === mode) {
+                    this.printText('   ' + mode + ' <-CURRENT');
+                } else
+                {
+                    this.printText('   ' + mode);
+
+                }
+
+
+            }
+
+
+
+            return;
+        }
+
 
 
 
@@ -271,9 +315,48 @@ save function!');
 
             var fileName = broken[1];
 
+
             this.downloadToLocal([out], fileName);
             return;
         }
+
+
+
+
+        if (broken[0] === 'IMAGE') {
+
+
+            if (broken.length !== 2) {
+
+                this.printText('A file name must be provided for the \n\
+save function!');
+
+                return;
+            }
+
+            var out = '';
+            var output = this.getTerminal().getOutput();
+
+            for (var index = 0; index < output.length; index++) {
+                out = out + output[index].getValue() + '\n';
+            }
+
+            var fileName = broken[1];
+
+            this.downloadImageToLocal(fileName);
+
+            return;
+        }
+
+
+
+
+
+
+
+
+
+
 
         if (broken[0] === 'FONT')
         {

@@ -16,7 +16,6 @@ class  Terminal {
     }
     addOldInput = function () {
         var toAdd = this.getInput().trim();
-
         if (toAdd.length < 1) {
             return;
         }
@@ -42,7 +41,6 @@ class  Terminal {
             return;
         }
         this.oldInputIndex = toSet;
-
     }
 
     incrementInputIndex = function () {
@@ -120,7 +118,6 @@ class  Terminal {
     setOutputLimit = function (toSet) {
         if (toSet < 1) {
             throw 'Output limit must be a positive number!';
-
         }
         this.outputLimit = toSet;
     }
@@ -138,9 +135,6 @@ class  Terminal {
         this.addTextOutput('(c) 2023 Christopher Tydings');
         this.addTextOutput('Version: ' + this.getVersion() + ' : April 14, 2023');
         this.addTextOutput('');
-
-
-
     }
 
     getOutputSize = function () {
@@ -152,7 +146,6 @@ class  Terminal {
             var sub = text.substring(0, this.getTextColCount());
             text = text.substring(this.getTextColCount());
             this.addTextOutput(sub);
-
         }
 
 
@@ -188,6 +181,11 @@ class  Terminal {
     clearOutput = function () {
 
         this.output = [];
+    }
+
+    getPNG = function () {
+
+        return  this.getArea().getCanvas().toDataURL('image/png');
     }
 
     getTextRowCount = function () {
@@ -296,8 +294,6 @@ class  Terminal {
         var first = this.getInput().substring(0, loc);
         var second = this.getInput().substring(loc);
         var toSet = first + toAdd + second;
-
-
         this.setInput(toSet);
     }
 
@@ -320,7 +316,6 @@ class  Terminal {
         var first = this.getInput().substring(0, len - 1);
         var second = this.getInput().substring(len);
         this.setInput(first + second);
-
     }
 
     getRowPosition = function (row) {
@@ -348,7 +343,6 @@ class  Terminal {
     getCursorInput = function (cursor) {
 
         var loc = this.getHorizontalOffset();
-
         if (loc === 0 || cursor.length < 1) {
             var ret = this.getInput() + cursor;
             return ret;
@@ -357,8 +351,6 @@ class  Terminal {
         var first = this.getInput().substring(0, loc);
         var second = this.getInput().substring(loc);
         return first + cursor + second;
-
-
     }
 
     getFormattedInput = function () {
@@ -373,7 +365,6 @@ class  Terminal {
             start = this.getInputLength() - start - this.getHorizontalOffset();
             var sub = this.getCursorInput(end).substring(start);
             return this.getInputPrefix() + sub;
-
         }
 
 
@@ -382,10 +373,8 @@ class  Terminal {
     }
 
     vertLock = false;
-
     getVerticalInputPadding = function () {
         return this.verticalInputPadding;
-
     }
     borderPadding = 5;
     getBorderPadding = function () {
@@ -397,7 +386,6 @@ class  Terminal {
 
         var xPos = 8;
         var yPos = 0;
-
         this.getArea().clear();
         this.getArea().setColor(this.getPalette().getBackgroundColor());
         this.getArea().drawBackground();
@@ -410,16 +398,12 @@ class  Terminal {
             var index = 0;
             var offset = this.getVerticalOffset();
             var index = this.getOutputSize() - 1 - offset;
-
-
             var start = 0;
-
             while (index >= 0) {
                 var len = this.getOutputAt(index).getHeight();
                 if (len <= rem) {
                     rem -= len;
                     start = index;
-
                 } else
                 {
                     break;
@@ -436,12 +420,10 @@ class  Terminal {
             while (index < this.getOutputSize())
             {
                 var len = this.getOutputAt(index).getHeight();
-
                 if (len <= rem) {
                     rem -= len;
                     yPos = this.getRowPosition(counter) + this.getBorderPadding();
                     this.getOutputAt(index).draw(xPos, yPos, this.getArea(), this);
-
                 } else
                 {
                     break;
