@@ -31,7 +31,7 @@ class SQLModule extends BaseModule {
     }
 
     needReset = function () {
-        return this.getCmdCounter >= this.getCmdResetThreshold();
+        return this.getCmdCounter() >= this.getCmdResetThreshold();
 
     }
 
