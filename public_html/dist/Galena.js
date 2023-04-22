@@ -1,7 +1,7 @@
 /**
  * Galena Terminal System(GTS) Distribution File
  * (c) 2023 Christopher Tydings
- * Dist Creation Timestamp : 2023-04-22_01-19-47
+ * Dist Creation Timestamp : 2023-04-22_02-54-48
  */
 
 const genUtils = {
@@ -226,7 +226,13 @@ var TerminalPalette = function () {
 class TerminalArea {
     constructor(canvas) {
         this.canvas = canvas;
-        this.setup();
+        // this.setup();
+    }
+    setCanvas = function (toSet, width, height) {
+        this.canvas = toSet;
+        this.context = null;
+        this.width = width;
+        this.height = height;
     }
     getCanvas = function () {
         return this.canvas;
@@ -302,7 +308,13 @@ class TerminalArea {
 class TerminalArea {
     constructor(canvas) {
         this.canvas = canvas;
-        this.setup();
+        // this.setup();
+    }
+    setCanvas = function (toSet, width, height) {
+        this.canvas = toSet;
+        this.context = null;
+        this.width = width;
+        this.height = height;
     }
     getCanvas = function () {
         return this.canvas;
@@ -376,9 +388,11 @@ class TerminalArea {
 
 /* global genUtils */
 class  Terminal {
-    constructor(canvas) {
+    constructor(canvas, skipSetup) {
         this.area = new TerminalArea(canvas);
-        this.setup();
+        if (skipSetup !== true) {
+            this.setup();
+        }
     }
     getArea = function () {
         return this.area;
@@ -464,7 +478,7 @@ class  Terminal {
     getCursor = function () {
         return this.cursor;
     }
-    outputLimit = 50;
+    outputLimit = 500;
     getOutputLimit = function () {
         return this.outputLimit;
     }
@@ -496,13 +510,18 @@ class  Terminal {
             text = text.substring(this.getTextColCount());
             this.addTextOutput(sub);
         }
+        var gross = this.getPalette().getFontHeight() * 1.0;
         var toAdd = {
             value: text,
             getValue: function () {
                 return this.value;
             },
+            gross: gross,
             getHeight: function () {
                 return 1;
+            },
+            getGrossHeight: function () {
+                return this.gross;
             },
             draw: function (xPos, yPos, area, caller) {
                 area.drawText(this.getValue(), xPos, yPos);
@@ -522,8 +541,33 @@ class  Terminal {
     clearOutput = function () {
         this.output = [];
     }
+    calculateIdealHeight = function () {
+        var ret = this.getVerticalInputPadding() * 2 * this.getPalette().getFontHeight();
+        for (var index = 0; index < this.getOutput().length; index++)
+        {
+            ret += this.getOutput()[index].getGrossHeight();
+        }
+        return ret;
+    }
+    setCanvas = function (toSet, width, height) {
+        this.getArea().setCanvas(toSet, width, height);
+        this.textRowCount = null;
+        this.textColCount = null;
+    }
     getPNG = function () {
-        return  this.getArea().getCanvas().toDataURL('image/png');
+        var oldCanvas = this.getArea().getCanvas();
+        var canvas = document.createElement('canvas');
+        var idealHeight = this.calculateIdealHeight();
+        canvas.width = this.getArea().getWidth();
+        canvas.height = idealHeight;
+        canvas.style.zIndex = 8;
+        canvas.style.position = "absolute";
+        canvas.style.border = "1px solid";
+        this.setCanvas(canvas, canvas.width, idealHeight);
+        this.paint();
+        var ret = this.getArea().getCanvas().toDataURL('image/png');
+        this.setCanvas(oldCanvas);
+        return ret;
     }
     getTextRowCount = function () {
         if (genUtils.isNull(this.textRowCount) === true) {
@@ -738,9 +782,11 @@ class  Terminal {
 
 /* global genUtils */
 class  Terminal {
-    constructor(canvas) {
+    constructor(canvas, skipSetup) {
         this.area = new TerminalArea(canvas);
-        this.setup();
+        if (skipSetup !== true) {
+            this.setup();
+        }
     }
     getArea = function () {
         return this.area;
@@ -826,7 +872,7 @@ class  Terminal {
     getCursor = function () {
         return this.cursor;
     }
-    outputLimit = 50;
+    outputLimit = 500;
     getOutputLimit = function () {
         return this.outputLimit;
     }
@@ -858,13 +904,18 @@ class  Terminal {
             text = text.substring(this.getTextColCount());
             this.addTextOutput(sub);
         }
+        var gross = this.getPalette().getFontHeight() * 1.0;
         var toAdd = {
             value: text,
             getValue: function () {
                 return this.value;
             },
+            gross: gross,
             getHeight: function () {
                 return 1;
+            },
+            getGrossHeight: function () {
+                return this.gross;
             },
             draw: function (xPos, yPos, area, caller) {
                 area.drawText(this.getValue(), xPos, yPos);
@@ -884,8 +935,33 @@ class  Terminal {
     clearOutput = function () {
         this.output = [];
     }
+    calculateIdealHeight = function () {
+        var ret = this.getVerticalInputPadding() * 2 * this.getPalette().getFontHeight();
+        for (var index = 0; index < this.getOutput().length; index++)
+        {
+            ret += this.getOutput()[index].getGrossHeight();
+        }
+        return ret;
+    }
+    setCanvas = function (toSet, width, height) {
+        this.getArea().setCanvas(toSet, width, height);
+        this.textRowCount = null;
+        this.textColCount = null;
+    }
     getPNG = function () {
-        return  this.getArea().getCanvas().toDataURL('image/png');
+        var oldCanvas = this.getArea().getCanvas();
+        var canvas = document.createElement('canvas');
+        var idealHeight = this.calculateIdealHeight();
+        canvas.width = this.getArea().getWidth();
+        canvas.height = idealHeight;
+        canvas.style.zIndex = 8;
+        canvas.style.position = "absolute";
+        canvas.style.border = "1px solid";
+        this.setCanvas(canvas, canvas.width, idealHeight);
+        this.paint();
+        var ret = this.getArea().getCanvas().toDataURL('image/png');
+        this.setCanvas(oldCanvas);
+        return ret;
     }
     getTextRowCount = function () {
         if (genUtils.isNull(this.textRowCount) === true) {
