@@ -277,8 +277,6 @@ save function!');
 
         if (broken[0] === 'FONT')
         {
-            if (broken[0] === 'NIGHT') {
-            }
 
 
 
