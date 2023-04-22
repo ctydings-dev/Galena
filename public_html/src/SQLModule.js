@@ -142,7 +142,11 @@ class SQLModule extends BaseModule {
         return false;
     }
 
-    execute = function (cmd) {
+    execute = function (cmd, print) {
+
+        if (genUtils.isNull(print) === true) {
+            print = true;
+        }
 
 
 
@@ -156,7 +160,9 @@ class SQLModule extends BaseModule {
 
 
 
-        this.getCaller().printText(cmd);
+        if (print === true) {
+            this.getCaller().printText(cmd);
+        }
         const stmt = this.getDatabase().prepare(cmd);
         stmt.getAsObject(); // {col1:1, col2:111}
 
@@ -197,8 +203,9 @@ class SQLModule extends BaseModule {
         }
 
 
-
-        this.getCaller().printText('');
+        if (print === true) {
+            this.getCaller().printText('');
+        }
 
     }
 
