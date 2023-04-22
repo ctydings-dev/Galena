@@ -117,6 +117,14 @@ class  Terminal {
         return this.outputLimit;
     }
 
+    setOutputLimit = function (toSet) {
+        if (toSet < 1) {
+            throw 'Output limit must be a positive number!';
+
+        }
+        this.outputLimit = toSet;
+    }
+
     version = '0.0.1';
     getVersion = function () {
         return this.version;
