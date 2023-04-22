@@ -68,7 +68,7 @@ var TerminalSystem = function (canvas, useVerbose) {
     };
     this.processDownEvent = function (event) {
 
-        var value = this.getKeySet().processDownEvent(event.keyCode);
+        var value = this.getKeySet().processDownEvent(event);
 
         if (value.isUnknown() === true) {
 
@@ -213,8 +213,10 @@ var TerminalSystem = function (canvas, useVerbose) {
             return;
         }
         input = input.substring(1);
+        var orig = [];
         var broken = genUtils.breakupString(input, ' ');
         for (var index in broken) {
+            orig.push(broken[index]);
             broken[index] = broken[index].trim().toUpperCase();
         }
 
@@ -249,13 +251,46 @@ var TerminalSystem = function (canvas, useVerbose) {
         }
 
 
-        if (broken[0] === 'NIGHT') {
+        if (broken[0] === 'SAVE') {
+
+
+            if (broken.length !== 2) {
+
+                this.printText('A file name must be provided for the \n\
+save function!');
+
+                return;
+            }
+
+            var out = '';
+            var output = this.getTerminal().getOutput();
+
+            for (var index = 0; index < output.length; index++) {
+                out = out + output[index].getValue() + '\n';
+            }
+
+            var fileName = broken[1];
+
+            this.downloadToLocal([out], fileName);
+            return;
+        }
+
+        if (broken[0] === 'FONT')
+        {
+            if (broken[0] === 'NIGHT') {
+            }
 
 
 
             this.getTerminal().getPalette().setNightColors();
+            var font = '';
 
+            for (var index = 1; index < broken.length; index++) {
 
+                font = font + orig[index] + ' ';
+
+            }
+            this.getTerminal().getPalette().setFont(font);
 
 
             return;
@@ -273,6 +308,17 @@ var TerminalSystem = function (canvas, useVerbose) {
             return;
         }
 
+        if (broken[0] === 'NIGHT') {
+
+
+
+            this.getTerminal().getPalette().setNightColors();
+
+
+
+
+            return;
+        }
 
 
 

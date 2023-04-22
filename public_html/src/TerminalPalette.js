@@ -33,7 +33,10 @@ var TerminalPalette = function () {
 
 
 
+    this.setFont = function (toSet) {
 
+        this.textFont = toSet;
+    };
 
 
 

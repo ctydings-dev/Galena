@@ -189,7 +189,7 @@ class SQLModule extends BaseModule {
                 index++;
             }
 
-
+            counter++;
 
         }
         if (genUtils.isNull(table) !== true) {

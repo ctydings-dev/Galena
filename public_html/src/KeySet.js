@@ -60,6 +60,24 @@ var KeySet = function () {
         191: '/',
         220: '\\',
         32: ' ',
+        189: '-',
+        187: '=',
+        96: '0',
+        97: '1',
+        98: '2',
+        99: '3',
+        100: '4',
+        101: '5',
+        102: '6',
+        103: '7',
+        104: '8',
+        105: '9',
+        110: '.',
+        106: '*',
+        109: '-',
+        107: '+',
+        111: '/'
+
     };
 
     this.upper = {
@@ -111,41 +129,44 @@ var KeySet = function () {
         191: '?',
         220: '|',
         32: ' ',
+        189: '_',
+        187: '+',
+        96: '0',
+        97: '1',
+        98: '2',
+        99: '3',
+        100: '4',
+        101: '5',
+        102: '6',
+        103: '7',
+        104: '8',
+        105: '9',
+        110: '.',
+        106: '*',
+        109: '-',
+        107: '+',
+        111: '/'
+
     };
 
-    this.shift = false;
-    this.alt = false;
+
     this.cntrl = false;
-    this.isShift = function () {
-        return this.shift === true;
-    };
-    this.altShift = function () {
-        this.shift = !this.isShift();
-    };
-    this.isAlt = function () {
-        return this.alt === true;
-    };
-    this.isCntrl = function () {
-        return this.cntrl === true;
-    };
-    this.altAlt = function () {
-        this.alt = !this.isAlt();
-    };
-    this.altCntrl = function () {
-        this.cntrl = !this.isCntrl;
-    };
 
-    this.processUpEvent = function (code) {
+    this.processUpEvent = function (event) {
+
+        var code = event.keyCode;
+
+
         if (code === this.shiftKey) {
-            this.altShift();
+
             return;
         }
         if (code === this.altKey) {
-            this.altAlt();
+
             return;
         }
         if (code === this.cntrlKey) {
-            this.altCntrl();
+
             return;
         }
 
@@ -156,12 +177,16 @@ var KeySet = function () {
 
 
 
-    this.processDownEvent = function (code) {
+    this.processDownEvent = function (event) {
+        var code = event.keyCode;
+        var alt = event.altKey === true;
+        var shift = event.shiftKey === true;
+        var cntrl = event.cntrlKey === true;
         var ret = {
             value: null,
-            alt: this.isAlt(),
-            cntrl: this.isCntrl(),
-            shift: this.isShift(),
+            alt: alt,
+            cntrl: cntrl,
+            shift: shift,
             isShift: function () {
                 return this.shift;
             },
@@ -217,7 +242,7 @@ var KeySet = function () {
             }
         };
 
-        if (this.isShift() === true) {
+        if (shift === true) {
 
             ret.setValue(this.upper[code]);
 
@@ -231,7 +256,7 @@ var KeySet = function () {
         }
 
         if (code === this.shiftKey) {
-            this.altShift();
+
             ret.process = false;
             return ret;
         }
