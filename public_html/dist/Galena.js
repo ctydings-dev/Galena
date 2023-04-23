@@ -1,7 +1,7 @@
 /**
  * Galena Terminal System(GTS) Distribution File
  * (c) 2023 Christopher Tydings
- * Dist Creation Timestamp : 2023-04-22_02-57-30
+ * Dist Creation Timestamp : 2023-04-23_10-39-26
  */
 
 const genUtils = {
@@ -65,6 +65,10 @@ var TerminalPalette = function () {
     this.dayTextColor = '#000000';
     this.nightBackgroundColor = '#2c333d';
     this.nightTextColor = '#5bc7a0';
+    this.nightErrorTextColor = '#d15858';
+    this.dayErrorTextColor = '#c90a0a';
+    this.dayAlertTextColor = '#9ba807';
+    this.nightAlertTextColor = '#d2d980';
     this.getDayBackgroundColor = function () {
         return this.dayBackgroundColor;
     };
@@ -77,8 +81,32 @@ var TerminalPalette = function () {
     this.getNightTextColor = function () {
         return this.nightTextColor;
     };
+    this.getNightErrorTextColor = function () {
+        return this.nightErrorTextColor;
+    };
+    this.getDayErrorTextColor = function () {
+        return this.dayErrorTextColor;
+    };
+    this.getNightAlertTextColor = function () {
+        return this.nightAlertTextColor;
+    };
+    this.getDayAlertTextColor = function () {
+        return this.dayAlertTextColor;
+    };
     this.getBackgroundColor = function () {
         return this.backgroundColor;
+    };
+    this.setErrorColor = function (color) {
+        this.errorTextColor = color;
+    };
+    this.getErrorColor = function () {
+        return this.errorTextColor;
+    };
+    this.setAlertColor = function (toSet) {
+        this.alertColor = toSet;
+    };
+    this.getAlertColor = function () {
+        return this.alertColor;
     };
     this.setFont = function (toSet) {
         this.textFont = toSet;
@@ -95,10 +123,14 @@ var TerminalPalette = function () {
     this.setDayColors = function () {
         this.setTextColor(this.getDayTextColor());
         this.setBackgroundColor(this.getDayBackgroundColor());
+        this.setErrorColor(this.getDayErrorTextColor());
+        this.setAlertColor(this.getDayAlertTextColor());
     };
     this.setNightColors = function () {
         this.setTextColor(this.getNightTextColor());
         this.setBackgroundColor(this.getNightBackgroundColor());
+        this.setErrorColor(this.getNightErrorTextColor());
+        this.setAlertColor(this.getNightAlertTextColor());
     };
     this.textFont = '14px Courier New';
     this.getFont = function () {
@@ -145,6 +177,13 @@ class TerminalArea {
             this.height = this.getCanvas().getBoundingClientRect().height;
         }
         return this.height;
+    }
+    getStyles = function () {
+        var ret = {
+            fill: this.getContext().fillStyle,
+            stroke: this.getContext().strokeStyle
+        };
+        return ret;
     }
     setColor = function (toSet) {
         this.getContext().fillStyle = toSet;
@@ -313,6 +352,44 @@ class  Terminal {
     getOutputSize = function () {
         return this.getOutput().length;
     }
+    addColorTextOutput = function (text, source) {
+        while (text.length > this.getTextColCount()) {
+            var sub = text.substring(0, this.getTextColCount());
+            text = text.substring(this.getTextColCount());
+            this.addColorTextOutput(sub, source);
+        }
+        var entry = this.addTextOutput(text);
+        entry.source = source;
+        entry.getColor = function () {
+            return this.source.getColor();
+        };
+        entry.draw = function (xPos, yPos, area, caller) {
+            var currColor = area.getStyles();
+            area.setColor(this.getColor());
+            area.drawText(this.getValue(), xPos, yPos);
+            area.setColor(currColor.fill);
+        };
+    }
+    addErrorTextOutput = function (text) {
+        var source = {
+            caller: this,
+            getColor: function () {
+                return this.caller.getPalette().getErrorColor();
+            }
+        };
+        this.addColorTextOutput(text, source);
+        return;
+    }
+    addAlertTextOutput = function (text) {
+        var source = {
+            caller: this,
+            getColor: function () {
+                return this.caller.getPalette().getAlertColor();
+            }
+        };
+        this.addColorTextOutput(text, source);
+        return;
+    }
     addTextOutput = function (text) {
         while (text.length > this.getTextColCount()) {
             var sub = text.substring(0, this.getTextColCount());
@@ -337,6 +414,7 @@ class  Terminal {
             }
         };
         this.addOutput(toAdd);
+        return toAdd;
     }
     getOutputAt = function (index) {
         return this.getOutput()[index];
@@ -678,6 +756,12 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.printText = function (toPrint) {
         this.getTerminal().addTextOutput(toPrint);
     };
+    this.printErrorText = function (toPrint) {
+        this.getTerminal().addErrorTextOutput(toPrint);
+    };
+    this.printAlertText = function (toPrint) {
+        this.getTerminal().addAlertTextOutput(toPrint)
+    };
     this.processCmd = function () {
         var input = this.getTerminal().getInput();
         input = input.trim();
@@ -689,7 +773,7 @@ var TerminalSystem = function (canvas, useVerbose) {
         try {
             this.executeModeCommand(input);
         } catch (err) {
-            this.printText(err);
+            this.printErrorText(err);
         }
         this.getTerminal().clearInput();
     };
@@ -754,6 +838,9 @@ var TerminalSystem = function (canvas, useVerbose) {
         document.body.removeChild(anchorTag);
     };
     this.downloadToLocal = function (data, fileName) {
+//Where this code was copied from tag is lost, will replace once found.
+//I believe that it came from https://stackoverflow.com/questions/3749231/
+//download-file-using-javascript-jquery
         var file = new Blob(data, {
             type: 'text'
         });
@@ -770,7 +857,7 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.executeSystemCommand = function (input) {
         this.getTerminal().clearInput();
         if (input.length < 1) {
-            this.printText('No command was given!');
+            this.printErrorText('No command was given!');
             return;
         }
         input = input.substring(1);
@@ -781,14 +868,14 @@ var TerminalSystem = function (canvas, useVerbose) {
             broken[index] = broken[index].trim().toUpperCase();
         }
         if (broken.length < 1) {
-            this.printText('No command was given!');
+            this.printErrorText('No command was given!');
             return;
         }
         if (broken[0] === 'MODES') {
             this.printText('Registered modes:');
             for (var mode in this.getModes()) {
                 if (this.getMode() === mode) {
-                    this.printText('   ' + mode + ' <-CURRENT');
+                    this.printText('   ' + mode + ' <- CURRENT');
                 } else
                 {
                     this.printText('   ' + mode);
@@ -814,7 +901,7 @@ var TerminalSystem = function (canvas, useVerbose) {
         }
         if (broken[0] === 'SAVE') {
             if (broken.length !== 2) {
-                this.printText('A file name must be provided for the \n\
+                this.printErrorText('A file name must be provided for the \n\
 save function!');
                 return;
             }
@@ -829,7 +916,7 @@ save function!');
         }
         if (broken[0] === 'IMAGE') {
             if (broken.length !== 2) {
-                this.printText('A file name must be provided for the \n\
+                this.printErrorText('A file name must be provided for the \n\
 save function!');
                 return;
             }
@@ -867,7 +954,7 @@ save function!');
             }
             return;
         }
-        this.printText('Command ' + broken[0] +
+        this.printErrorText('Command ' + broken[0] +
                 ' is not a recognized command!');
     };
     var caller = this;
@@ -957,7 +1044,8 @@ var KeySet = function () {
         106: '*',
         109: '-',
         107: '+',
-        111: '/'
+        111: '/',
+        186: ';'
     };
     this.upper = {
         65: 'A',
@@ -1024,7 +1112,8 @@ var KeySet = function () {
         106: '*',
         109: '-',
         107: '+',
-        111: '/'
+        111: '/',
+        186: ':'
     };
     this.cntrl = false;
     this.processUpEvent = function (event) {
@@ -1254,16 +1343,16 @@ class SQLModule extends BaseModule {
             cmd = cmd.trim();
             var fileName = cmd.substring(6).trim();
             if (fileName.length < 1) {
-                this.getCaller().printText('No file name given!');
+                this.getCaller().printErrorText('No file name given!');
                 return;
             }
             this.exportDBToLocal(fileName);
-            this.getCaller().printText('Database exported to ' + fileName + '.');
+            this.getCaller().printAlertText('Database exported to ' + fileName + '.');
             return true;
         }
         if (toCheck === 'RELOAD') {
             this.reloadDB();
-            this.getCaller().printText('Database reloaded.');
+            this.getCaller().printAlertText('Database reloaded.');
             return true;
         }
         return false;
@@ -1282,34 +1371,38 @@ class SQLModule extends BaseModule {
         if (print === true) {
             this.getCaller().printText(cmd);
         }
-        const stmt = this.getDatabase().prepare(cmd);
-        stmt.getAsObject(); // {col1:1, col2:111}
-        // Bind new values
-        stmt.bind();
-        var table = null;
-        var counter = 0;
-        while (stmt.step()) { //
-            const row = stmt.getAsObject();
-            if (counter === 0) {
-                var cols = [];
-                for (var prop in row) {
-                    cols.push(prop + '');
+        try {
+            const stmt = this.getDatabase().prepare(cmd);
+            stmt.getAsObject(); // {col1:1, col2:111}
+            // Bind new values
+            stmt.bind();
+            var table = null;
+            var counter = 0;
+            while (stmt.step()) { //
+                const row = stmt.getAsObject();
+                if (counter === 0) {
+                    var cols = [];
+                    for (var prop in row) {
+                        cols.push(prop + '');
+                    }
+                    table = new TextTable(cols);
                 }
-                table = new TextTable(cols);
+                var index = 0;
+                for (var prop in row) {
+                    var value = row[prop];
+                    table.setCell(counter, index, value);
+                    index++;
+                }
+                counter++;
             }
-            var index = 0;
-            for (var prop in row) {
-                var value = row[prop];
-                table.setCell(counter, index, value);
-                index++;
+            if (genUtils.isNull(table) !== true) {
+                this.getCaller().printTable(table);
             }
-            counter++;
-        }
-        if (genUtils.isNull(table) !== true) {
-            this.getCaller().printTable(table);
-        }
-        if (print === true) {
-            this.getCaller().printText('');
+            if (print === true) {
+                this.getCaller().printText('');
+            }
+        } catch (err) {
+            this.getCaller().printErrorText(err);
         }
     }
 }
