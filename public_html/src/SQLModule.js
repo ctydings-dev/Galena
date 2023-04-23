@@ -115,14 +115,14 @@ class SQLModule extends BaseModule {
             var fileName = cmd.substring(6).trim();
             if (fileName.length < 1) {
 
-                this.getCaller().printText('No file name given!');
+                this.getCaller().printErrorText('No file name given!');
                 return;
 
             }
 
 
             this.exportDBToLocal(fileName);
-            this.getCaller().printText('Database exported to ' + fileName + '.');
+            this.getCaller().printAlertText('Database exported to ' + fileName + '.');
             return true;
         }
 
@@ -130,7 +130,7 @@ class SQLModule extends BaseModule {
         if (toCheck === 'RELOAD') {
 
             this.reloadDB();
-            this.getCaller().printText('Database reloaded.');
+            this.getCaller().printAlertText('Database reloaded.');
 
             return true;
         }
@@ -164,48 +164,55 @@ class SQLModule extends BaseModule {
         if (print === true) {
             this.getCaller().printText(cmd);
         }
-        const stmt = this.getDatabase().prepare(cmd);
-        stmt.getAsObject(); // {col1:1, col2:111}
-
-        // Bind new values
-        stmt.bind();
-
-        var table = null;
-
-        var counter = 0;
+        try {
 
 
-        while (stmt.step()) { //
-            const row = stmt.getAsObject();
-            if (counter === 0) {
+            const stmt = this.getDatabase().prepare(cmd);
+            stmt.getAsObject(); // {col1:1, col2:111}
 
-                var cols = [];
-                for (var prop in row) {
-                    cols.push(prop + '');
+            // Bind new values
+            stmt.bind();
 
+            var table = null;
+
+            var counter = 0;
+
+
+            while (stmt.step()) { //
+                const row = stmt.getAsObject();
+                if (counter === 0) {
+
+                    var cols = [];
+                    for (var prop in row) {
+                        cols.push(prop + '');
+
+                    }
+
+                    table = new TextTable(cols);
                 }
 
-                table = new TextTable(cols);
+                var index = 0;
+                for (var prop in row) {
+                    var value = row[prop];
+                    table.setCell(counter, index, value);
+
+                    index++;
+                }
+
+                counter++;
+
+            }
+            if (genUtils.isNull(table) !== true) {
+                this.getCaller().printTable(table);
             }
 
-            var index = 0;
-            for (var prop in row) {
-                var value = row[prop];
-                table.setCell(counter, index, value);
 
-                index++;
+            if (print === true) {
+                this.getCaller().printText('');
             }
+        } catch (err) {
 
-            counter++;
-
-        }
-        if (genUtils.isNull(table) !== true) {
-            this.getCaller().printTable(table);
-        }
-
-
-        if (print === true) {
-            this.getCaller().printText('');
+            this.getCaller().printErrorText(err);
         }
 
     }

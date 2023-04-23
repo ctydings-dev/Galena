@@ -143,6 +143,69 @@ class  Terminal {
         return this.getOutput().length;
     }
 
+    addColorTextOutput = function (text, source) {
+
+
+        while (text.length > this.getTextColCount()) {
+            var sub = text.substring(0, this.getTextColCount());
+            text = text.substring(this.getTextColCount());
+            this.addColorTextOutput(sub, source);
+        }
+
+        var entry = this.addTextOutput(text);
+        entry.source = source;
+        entry.getColor = function () {
+
+            return this.source.getColor();
+
+        };
+
+        entry.draw = function (xPos, yPos, area, caller) {
+
+            var currColor = area.getStyles();
+            area.setColor(this.getColor());
+            area.drawText(this.getValue(), xPos, yPos);
+            area.setColor(currColor.fill);
+
+
+
+        };
+
+
+
+
+    }
+
+    addErrorTextOutput = function (text) {
+
+
+        var source = {
+            caller: this,
+            getColor: function () {
+                return this.caller.getPalette().getErrorColor();
+            }
+        };
+
+        this.addColorTextOutput(text, source);
+        return;
+
+    }
+
+    addAlertTextOutput = function (text) {
+        var source = {
+            caller: this,
+            getColor: function () {
+                return this.caller.getPalette().getAlertColor();
+            }
+        };
+
+        this.addColorTextOutput(text, source);
+        return;
+
+
+
+    }
+
     addTextOutput = function (text) {
         while (text.length > this.getTextColCount()) {
             var sub = text.substring(0, this.getTextColCount());
@@ -170,6 +233,7 @@ class  Terminal {
 
         };
         this.addOutput(toAdd);
+        return toAdd;
     }
 
     getOutputAt = function (index) {

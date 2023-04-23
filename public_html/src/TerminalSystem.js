@@ -99,6 +99,21 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.printText = function (toPrint) {
         this.getTerminal().addTextOutput(toPrint);
     };
+
+    this.printErrorText = function (toPrint) {
+
+        this.getTerminal().addErrorTextOutput(toPrint);
+
+    };
+
+    this.printAlertText = function (toPrint) {
+        this.getTerminal().addAlertTextOutput(toPrint)
+    };
+
+
+
+
+
     this.processCmd = function () {
         var input = this.getTerminal().getInput();
         input = input.trim();
@@ -111,7 +126,7 @@ var TerminalSystem = function (canvas, useVerbose) {
         try {
             this.executeModeCommand(input);
         } catch (err) {
-            this.printText(err);
+            this.printErrorText(err);
         }
         this.getTerminal().clearInput();
     };
@@ -210,7 +225,9 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.downloadToLocal = function (data, fileName) {
 
 
-
+//Where this code was copied from tag is lost, will replace once found.
+//I believe that it came from https://stackoverflow.com/questions/3749231/
+//download-file-using-javascript-jquery
 
         var file = new Blob(data, {
             type: 'text'
@@ -230,7 +247,7 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.executeSystemCommand = function (input) {
         this.getTerminal().clearInput();
         if (input.length < 1) {
-            this.printText('No command was given!');
+            this.printErrorText('No command was given!');
             return;
         }
         input = input.substring(1);
@@ -243,7 +260,7 @@ var TerminalSystem = function (canvas, useVerbose) {
 
         if (broken.length < 1) {
 
-            this.printText('No command was given!');
+            this.printErrorText('No command was given!');
             return;
         }
 
@@ -254,7 +271,7 @@ var TerminalSystem = function (canvas, useVerbose) {
             for (var mode in this.getModes()) {
 
                 if (this.getMode() === mode) {
-                    this.printText('   ' + mode + ' <-CURRENT');
+                    this.printText('   ' + mode + ' <- CURRENT');
                 } else
                 {
                     this.printText('   ' + mode);
@@ -300,7 +317,7 @@ var TerminalSystem = function (canvas, useVerbose) {
 
             if (broken.length !== 2) {
 
-                this.printText('A file name must be provided for the \n\
+                this.printErrorText('A file name must be provided for the \n\
 save function!');
 
                 return;
@@ -328,7 +345,7 @@ save function!');
 
             if (broken.length !== 2) {
 
-                this.printText('A file name must be provided for the \n\
+                this.printErrorText('A file name must be provided for the \n\
 save function!');
 
                 return;
@@ -420,7 +437,7 @@ save function!');
 
 
 
-        this.printText('Command ' + broken[0] +
+        this.printErrorText('Command ' + broken[0] +
                 ' is not a recognized command!');
 
 

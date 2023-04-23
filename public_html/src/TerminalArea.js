@@ -41,6 +41,17 @@ class TerminalArea {
         return this.height;
     }
 
+    getStyles = function () {
+
+        var ret = {
+            fill: this.getContext().fillStyle,
+            stroke: this.getContext().strokeStyle
+
+        };
+
+        return ret;
+    }
+
     setColor = function (toSet) {
         this.getContext().fillStyle = toSet;
         this.getContext().strokeStyle = toSet;
