@@ -217,4 +217,39 @@ class SQLModule extends BaseModule {
 
     }
 
+    printHelp = function () {
+        var help = 'To use, enter the sql command in a SQLLite format. '
+                + 'Several custom commands can also be used. Command parameters, where applicable, are separated by a space.';
+        this.getCaller().printText(help);
+        this.getCaller().printText('');
+        this.getCaller().printText('Custom Commands:');
+        var cols = ['Name', 'Desc.'];
+        var table = new TextTable(cols);
+        table.setCell(0, 0, 'DOWNLOAD file_name');
+        table.setCell(0, 1, 'Downloads the DB as a binary array.');
+        table.setCell(1, 0, 'RELOAD');
+        table.setCell(1, 1, 'Reloads the database. Typcially used for internal use.');
+        this.getCaller().printTable(table);
+        this.getCaller().printText('');
+
+        help = 'Pragma can also be used for SQLLite system operations. ' +
+                'To use, type \' PRAGMA\' plus the command name/paramters.'
+                + ' Please set the parameters in parenthesis.';
+        this.getCaller().printText(help);
+        this.getCaller().printText('');
+        this.getCaller().printText('Pragma Commands:');
+        cols = ['Name', 'Desc.'];
+        table = new TextTable(cols);
+        table.setCell(0, 0, 'TABLE_LIST');
+        table.setCell(0, 1, 'Lists the tables.');
+        table.setCell(1, 0, 'TABLE_INFO(table_name)');
+        table.setCell(1, 1, 'Lists the columns in the table.');
+        this.getCaller().printTable(table);
+
+
+
+
+
+    }
+
 }

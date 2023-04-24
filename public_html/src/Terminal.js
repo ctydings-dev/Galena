@@ -151,7 +151,6 @@ class  Terminal {
 
     addColorTextOutput = function (text, source) {
 
-
         while (text.length > this.getTextColCount()) {
             var sub = text.substring(0, this.getTextColCount());
             text = text.substring(this.getTextColCount());
@@ -214,9 +213,15 @@ class  Terminal {
 
     addTextOutput = function (text) {
         while (text.length > this.getTextColCount()) {
-            var sub = text.substring(0, this.getTextColCount());
-            text = text.substring(this.getTextColCount());
-            this.addTextOutput(sub);
+            /* var sub = text.substring(0, this.getTextColCount());
+             text = text.substring(this.getTextColCount());
+             this.addTextOutput(sub);
+             */
+            var broken = genUtils.smartBreakup(text, this.getTextColCount());
+
+            this.addTextOutput(broken.first);
+            text = broken.second;
+
         }
 
         var gross = this.getPalette().getFontHeight() * 1.0;

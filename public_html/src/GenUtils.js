@@ -14,7 +14,6 @@ const genUtils = {
 
         return false;
     },
-
     isNumber: function (toTest) {
         if (isNaN(toTest) === true) {
             return false;
@@ -22,14 +21,12 @@ const genUtils = {
 
         return true;
     },
-
     isInteger: function (toTest) {
         if (this.isNumber(toTest) === false) {
             return false;
         }
         return toTest % 1 === 0;
     },
-
     isType: function (toTest, target) {
         if (this.isNull(toTest) || this.isNull(toTest.getType)) {
             return false;
@@ -39,8 +36,6 @@ const genUtils = {
         }
 
         return ('' + toTest.getType()).trim().toUpperCase() === (target + '').trim().toUpperCase();
-
-
     },
     getTime: function () {
         var temp = new Date();
@@ -56,7 +51,6 @@ const genUtils = {
             }
             input = input.substring(index + delim.length);
             index = input.indexOf(delim);
-
         }
         if (input.length > 0) {
             ret.push(input);
@@ -64,8 +58,53 @@ const genUtils = {
 
 
         return ret;
+    },
+    smartBreakup: function (toBreak, length) {
+        if (toBreak.length <= length) {
+            return toBreak;
+        }
+
+
+        var broken = this.breakupString(toBreak, ' ');
+        if (broken[0].length > length) {
+            var first = toBreak.substring(0, length);
+            var second = toBreak.substring(length);
+            var ret = {
+                first: first,
+                second: second
+            };
+            return ret;
+        }
+
+
+        var first = broken[0];
+        for (var index = 1; index < broken.length; index++) {
+            var cur = first.length + broken[index].length + 1;
+            if (cur > length) {
+
+                var second = '';
+                for (var sub = index; sub < broken.length; sub++) {
+                    second = second + ' ' + broken[sub];
+                }
+                second = second.substring(1, second.length);
+                var ret = {
+                    first: first,
+                    second: second
+                };
+                return ret;
+            }
+
+            first = first + ' ' + broken[index];
+
+
+
+
+        }
+
+        var ret = {
+            first: first,
+            second: ''
+        };
+        return ret;
     }
-
-
-
 };

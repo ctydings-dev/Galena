@@ -44,14 +44,19 @@ var TerminalSystem = function (canvas, useVerbose) {
             if (genUtils.isNull(this.getMode) === true) {
                 throw 'No mode has been selected!';
             }
-            this.getModes()[this.getMode()].execute(cmd);
+            this.getMode().execute(cmd);
         } catch (err) {
             throw err;
         }
     };
     this.getMode = function () {
+        return this.getModes()[this.getModeName()];
+    };
+
+    this.getModeName = function () {
         return this.mode;
     };
+
     this.setMode = function (toSet) {
         var orig = this.getMode();
         try {
@@ -62,15 +67,15 @@ var TerminalSystem = function (canvas, useVerbose) {
                 throw toSet + ' is not a valid mode!';
             }
             this.mode = toSet;
-            this.getModes()[this.getMode()].activate(this);
-            if (this.getModes()[this.getMode()].hasIntroText()) {
-                this.printAlertText(this.getModes()[this.getMode()].getIntroText());
+            this.getMode().activate(this);
+            if (this.getMode().hasIntroText()) {
+                this.printAlertText(this.getMode().getIntroText());
             }
         } catch (err) {
             this.printErrorText(err + '');
 
             this.mode = orig;
-            this.printErrorText('Mode reset to ' + this.getMode() + '!');
+            this.printErrorText('Mode reset to ' + this.getModeName() + '!');
         }
 
     };
@@ -125,12 +130,12 @@ var TerminalSystem = function (canvas, useVerbose) {
 
     this.printErrorText = function (toPrint) {
 
-        this.getTerminal().addErrorTextOutput(toPrint);
+        this.getTerminal().addErrorTextOutput('' + toPrint);
 
     };
 
     this.printAlertText = function (toPrint) {
-        this.getTerminal().addAlertTextOutput(toPrint)
+        this.getTerminal().addAlertTextOutput(toPrint);
     };
 
 
@@ -287,13 +292,70 @@ var TerminalSystem = function (canvas, useVerbose) {
             return;
         }
 
+        if (broken[0] === 'HELP') {
 
-        if (broken[0] === 'MODES') {
+            if (broken.length > 1) {
+
+
+                for (var index = 1; index < broken.length; index++) {
+                    var mod = this.getModes()[broken[index]];
+                    if (genUtils.isNull(mod) === true) {
+
+                        this.printErrorText(broken[index] + ' is not a listed module!');
+
+                    } else
+                    {
+                        mod.printHelp();
+                    }
+
+                }
+
+                return;
+
+
+            }
+
+
+            this.getMode().printHelp();
+
+
+
+            return;
+        }
+
+
+
+
+
+
+        if (broken[0] === 'MODE')
+        {
+            if (broken.length > 1) {
+                //this.printText('The mode is : ' + this.getMode());
+
+
+
+                var mode = broken[1];
+                try {
+                    this.printVerbose('Setting mode to ' + mode + '.');
+                    this.setMode(mode);
+                    return;
+
+                } catch (err) {
+                    this.printText(err);
+                }
+
+            }
+        }
+
+
+
+        if (broken[0] === 'MODE' || broken[0] === 'MODES') {
 
             this.printText('Registered modes:');
             for (var mode in this.getModes()) {
 
-                if (this.getMode() === mode) {
+                if (this.getModeName() === mode) {
                     this.printAlertText('   ' + mode + ' <- CURRENT');
                 } else
                 {
@@ -312,27 +374,15 @@ var TerminalSystem = function (canvas, useVerbose) {
 
 
 
-        if (broken[0] === 'MODE')
-        {
-            if (broken.length < 2) {
-                this.printText('The mode is : ' + this.getMode());
-
-                return;
-            }
-
-            var mode = broken[1];
-            try {
-                this.printVerbose('Setting mode to ' + mode + '.');
-                this.setMode(mode);
-                return;
-
-            } catch (err) {
-                this.printText(err);
-            }
 
 
-            return;
-        }
+
+
+
+
+
+
+
 
 
         if (broken[0] === 'SAVE') {

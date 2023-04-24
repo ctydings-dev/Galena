@@ -36,5 +36,13 @@ class BaseModule {
         return this.getActivateText().length > 0;
     }
 
+    printHelp = function () {
+
+        this.getCaller().printErrorText('No help for ' + this.getName()
+                + ' has been added.');
+
+
+    }
+
 }
 
