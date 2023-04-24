@@ -124,7 +124,8 @@ class  Terminal {
         this.outputLimit = toSet;
     }
 
-    version = '0.0.1';
+    //  version = '0.0.1';
+    date = '';
     getVersion = function () {
         return this.version;
     }
@@ -135,7 +136,12 @@ class  Terminal {
         }
         this.addTextOutput("Welcome to the Galena Terminal System(GTS)");
         this.addTextOutput('(c) 2023 Christopher Tydings');
-        this.addTextOutput('Version: ' + this.getVersion() + ' : April 14, 2023');
+        //   this.addTextOutput('Version: ' + this.getVersion() + ' : April 14, 2023');
+        try {
+            this.addTextOutput('Compilation Date : ' + GALENA_COMPILATION_DATE);
+        } catch (err) {
+            this.addErrorTextOutput('No Compilation Date Found!');
+        }
         this.addTextOutput('');
     }
 
