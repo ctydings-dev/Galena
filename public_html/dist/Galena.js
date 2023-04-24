@@ -1,9 +1,9 @@
 /**
  * Galena Terminal System(GTS) Distribution File
  * (c) 2023 Christopher Tydings
- * Dist Creation Timestamp : 2023-04-24_03-08-56
+ * Dist Creation Timestamp : 2023-04-24_07-48-22
  */
-const GALENA_COMPILATION_DATE = '2023-04-24_03-08-56';
+const GALENA_COMPILATION_DATE = '2023-04-24_07-48-22';
 const genUtils = {
     isNull: function (toTest) {
         if (toTest === false) {
@@ -56,6 +56,43 @@ const genUtils = {
         if (input.length > 0) {
             ret.push(input);
         }
+        return ret;
+    },
+    smartBreakup: function (toBreak, length) {
+        if (toBreak.length <= length) {
+            return toBreak;
+        }
+        var broken = this.breakupString(toBreak, ' ');
+        if (broken[0].length > length) {
+            var first = toBreak.substring(0, length);
+            var second = toBreak.substring(length);
+            var ret = {
+                first: first,
+                second: second
+            };
+            return ret;
+        }
+        var first = broken[0];
+        for (var index = 1; index < broken.length; index++) {
+            var cur = first.length + broken[index].length + 1;
+            if (cur > length) {
+                var second = '';
+                for (var sub = index; sub < broken.length; sub++) {
+                    second = second + ' ' + broken[sub];
+                }
+                second = second.substring(1, second.length);
+                var ret = {
+                    first: first,
+                    second: second
+                };
+                return ret;
+            }
+            first = first + ' ' + broken[index];
+        }
+        var ret = {
+            first: first,
+            second: ''
+        };
         return ret;
     }
 };
@@ -398,9 +435,13 @@ class  Terminal {
     }
     addTextOutput = function (text) {
         while (text.length > this.getTextColCount()) {
-            var sub = text.substring(0, this.getTextColCount());
-            text = text.substring(this.getTextColCount());
-            this.addTextOutput(sub);
+            /* var sub = text.substring(0, this.getTextColCount());
+             text = text.substring(this.getTextColCount());
+             this.addTextOutput(sub);
+             */
+            var broken = genUtils.smartBreakup(text, this.getTextColCount());
+            this.addTextOutput(broken.first);
+            text = broken.second;
         }
         var gross = this.getPalette().getFontHeight() * 1.0;
         var toAdd = {
@@ -715,12 +756,15 @@ var TerminalSystem = function (canvas, useVerbose) {
             if (genUtils.isNull(this.getMode) === true) {
                 throw 'No mode has been selected!';
             }
-            this.getModes()[this.getMode()].execute(cmd);
+            this.getMode().execute(cmd);
         } catch (err) {
             throw err;
         }
     };
     this.getMode = function () {
+        return this.getModes()[this.getModeName()];
+    };
+    this.getModeName = function () {
         return this.mode;
     };
     this.setMode = function (toSet) {
@@ -732,14 +776,14 @@ var TerminalSystem = function (canvas, useVerbose) {
                 throw toSet + ' is not a valid mode!';
             }
             this.mode = toSet;
-            this.getModes()[this.getMode()].activate(this);
-            if (this.getModes()[this.getMode()].hasIntroText()) {
-                this.printAlertText(this.getModes()[this.getMode()].getIntroText());
+            this.getMode().activate(this);
+            if (this.getMode().hasIntroText()) {
+                this.printAlertText(this.getMode().getIntroText());
             }
         } catch (err) {
             this.printErrorText(err + '');
             this.mode = orig;
-            this.printErrorText('Mode reset to ' + this.getMode() + '!');
+            this.printErrorText('Mode reset to ' + this.getModeName() + '!');
         }
     };
     this.getSystemKey = function () {
@@ -784,10 +828,10 @@ var TerminalSystem = function (canvas, useVerbose) {
         this.getTerminal().addTextOutput(toPrint);
     };
     this.printErrorText = function (toPrint) {
-        this.getTerminal().addErrorTextOutput(toPrint);
+        this.getTerminal().addErrorTextOutput('' + toPrint);
     };
     this.printAlertText = function (toPrint) {
-        this.getTerminal().addAlertTextOutput(toPrint)
+        this.getTerminal().addAlertTextOutput(toPrint);
     };
     this.processCmd = function () {
         var input = this.getTerminal().getInput();
@@ -898,31 +942,45 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.printErrorText('No command was given!');
             return;
         }
-        if (broken[0] === 'MODES') {
+        if (broken[0] === 'HELP') {
+            if (broken.length > 1) {
+                for (var index = 1; index < broken.length; index++) {
+                    var mod = this.getModes()[broken[index]];
+                    if (genUtils.isNull(mod) === true) {
+                        this.printErrorText(broken[index] + ' is not a listed module!');
+                    } else
+                    {
+                        mod.printHelp();
+                    }
+                }
+                return;
+            }
+            this.getMode().printHelp();
+            return;
+        }
+        if (broken[0] === 'MODE')
+        {
+            if (broken.length > 1) {
+                //this.printText('The mode is : ' + this.getMode());
+                var mode = broken[1];
+                try {
+                    this.printVerbose('Setting mode to ' + mode + '.');
+                    this.setMode(mode);
+                    return;
+                } catch (err) {
+                    this.printText(err);
+                }
+            }
+        }
+        if (broken[0] === 'MODE' || broken[0] === 'MODES') {
             this.printText('Registered modes:');
             for (var mode in this.getModes()) {
-                if (this.getMode() === mode) {
+                if (this.getModeName() === mode) {
                     this.printAlertText('   ' + mode + ' <- CURRENT');
                 } else
                 {
                     this.printText('   ' + mode);
                 }
-            }
-            return;
-        }
-        if (broken[0] === 'MODE')
-        {
-            if (broken.length < 2) {
-                this.printText('The mode is : ' + this.getMode());
-                return;
-            }
-            var mode = broken[1];
-            try {
-                this.printVerbose('Setting mode to ' + mode + '.');
-                this.setMode(mode);
-                return;
-            } catch (err) {
-                this.printText(err);
             }
             return;
         }
@@ -1313,6 +1371,10 @@ class BaseModule {
     hasActivateText = function () {
         return this.getActivateText().length > 0;
     }
+    printHelp = function () {
+        this.getCaller().printErrorText('No help for ' + this.getName()
+                + ' has been added.');
+    }
 }
 
 class SQLModule extends BaseModule {
@@ -1447,6 +1509,34 @@ class SQLModule extends BaseModule {
         } catch (err) {
             this.getCaller().printErrorText(err);
         }
+    }
+    printHelp = function () {
+        var help = 'To use, enter the sql command in a SQLLite format. '
+                + 'Several custom commands can also be used. Command parameters, where applicable, are separated by a space.';
+        this.getCaller().printText(help);
+        this.getCaller().printText('');
+        this.getCaller().printText('Custom Commands:');
+        var cols = ['Name', 'Desc.'];
+        var table = new TextTable(cols);
+        table.setCell(0, 0, 'DOWNLOAD file_name');
+        table.setCell(0, 1, 'Downloads the DB as a binary array.');
+        table.setCell(1, 0, 'RELOAD');
+        table.setCell(1, 1, 'Reloads the database. Typcially used for internal use.');
+        this.getCaller().printTable(table);
+        this.getCaller().printText('');
+        help = 'Pragma can also be used for SQLLite system operations. ' +
+                'To use, type \' PRAGMA\' plus the command name/paramters.'
+                + ' Please set the parameters in parenthesis.';
+        this.getCaller().printText(help);
+        this.getCaller().printText('');
+        this.getCaller().printText('Pragma Commands:');
+        cols = ['Name', 'Desc.'];
+        table = new TextTable(cols);
+        table.setCell(0, 0, 'TABLE_LIST');
+        table.setCell(0, 1, 'Lists the tables.');
+        table.setCell(1, 0, 'TABLE_INFO(table_name)');
+        table.setCell(1, 1, 'Lists the columns in the table.');
+        this.getCaller().printTable(table);
     }
 }
 
