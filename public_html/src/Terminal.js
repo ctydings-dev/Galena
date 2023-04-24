@@ -227,6 +227,7 @@ class  Terminal {
                 return this.gross;
             },
             draw: function (xPos, yPos, area, caller) {
+                area.setColor(caller.getPalette().getTextColor());
                 area.drawText(this.getValue(), xPos, yPos);
             }
 
@@ -445,6 +446,7 @@ class  Terminal {
     }
 
     getRowPosition = function (row) {
+
         return  Math.floor(this.getPalette().getFontHeight() * row + this.getPalette().getFontHeight() / 2);
     }
 
@@ -562,6 +564,7 @@ class  Terminal {
 
         }
         yPos = this.getRowPosition(this.getTextRowCount() - 1);
+        this.getArea().setColor(this.getPalette().getTextColor());
         this.getArea().drawText(this.getFormattedInput(), xPos, yPos);
     }
 

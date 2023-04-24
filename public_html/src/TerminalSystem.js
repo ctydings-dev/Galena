@@ -19,37 +19,60 @@ var TerminalSystem = function (canvas, useVerbose) {
     };
     this.addModule = function (toAdd) {
 
-        toAdd.caller = this;
-        toAdd.getCaller = function () {
-            return this.caller;
-        };
-        var name = toAdd.getName().trim().toUpperCase();
-        this.getModes()[name] = toAdd;
-        if (this.hasMode() === false) {
-            this.setMode(name);
+        try {
+            toAdd.caller = this;
+            toAdd.getCaller = function () {
+                return this.caller;
+            };
+            var name = toAdd.getName().trim().toUpperCase();
+            this.getModes()[name] = toAdd;
+            if (this.hasMode() === false) {
+                this.setMode(name);
+            }
+        } catch (err) {
+            this.printErrorText(err + '');
+
         }
+
 
     };
     this.hasMode = function () {
         return genUtils.isNull(this.getMode()) !== true;
     };
     this.executeModeCommand = function (cmd) {
-        if (genUtils.isNull(this.getMode) === true) {
-            throw 'No mode has been selected!';
+        try {
+            if (genUtils.isNull(this.getMode) === true) {
+                throw 'No mode has been selected!';
+            }
+            this.getModes()[this.getMode()].execute(cmd);
+        } catch (err) {
+            throw err;
         }
-        this.getModes()[this.getMode()].execute(cmd);
     };
     this.getMode = function () {
         return this.mode;
     };
     this.setMode = function (toSet) {
-        toSet = toSet + '';
-        toSet = toSet.trim().toUpperCase();
+        var orig = this.getMode();
+        try {
+            toSet = toSet + '';
+            toSet = toSet.trim().toUpperCase();
 
-        if (genUtils.isNull(this.getModes()[toSet]) === true) {
-            throw toSet + ' is not a valid mode!';
+            if (genUtils.isNull(this.getModes()[toSet]) === true) {
+                throw toSet + ' is not a valid mode!';
+            }
+            this.mode = toSet;
+            this.getModes()[this.getMode()].activate(this);
+            if (this.getModes()[this.getMode()].hasIntroText()) {
+                this.printAlertText(this.getModes()[this.getMode()].getIntroText());
+            }
+        } catch (err) {
+            this.printErrorText(err + '');
+
+            this.mode = orig;
+            this.printErrorText('Mode reset to ' + this.getMode() + '!');
         }
-        this.mode = toSet;
+
     };
     this.getSystemKey = function () {
         return this.systemKey;
@@ -271,7 +294,7 @@ var TerminalSystem = function (canvas, useVerbose) {
             for (var mode in this.getModes()) {
 
                 if (this.getMode() === mode) {
-                    this.printText('   ' + mode + ' <- CURRENT');
+                    this.printAlertText('   ' + mode + ' <- CURRENT');
                 } else
                 {
                     this.printText('   ' + mode);
