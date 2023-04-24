@@ -1,9 +1,9 @@
 /**
  * Galena Terminal System(GTS) Distribution File
  * (c) 2023 Christopher Tydings
- * Dist Creation Timestamp : 2023-04-23_10-39-26
+ * Dist Creation Timestamp : 2023-04-24_03-08-56
  */
-
+const GALENA_COMPILATION_DATE = '2023-04-24_03-08-56';
 const genUtils = {
     isNull: function (toTest) {
         if (toTest === false) {
@@ -336,7 +336,8 @@ class  Terminal {
         }
         this.outputLimit = toSet;
     }
-    version = '0.0.1';
+    //  version = '0.0.1';
+    date = '';
     getVersion = function () {
         return this.version;
     }
@@ -346,7 +347,12 @@ class  Terminal {
         }
         this.addTextOutput("Welcome to the Galena Terminal System(GTS)");
         this.addTextOutput('(c) 2023 Christopher Tydings');
-        this.addTextOutput('Version: ' + this.getVersion() + ' : April 14, 2023');
+        //   this.addTextOutput('Version: ' + this.getVersion() + ' : April 14, 2023');
+        try {
+            this.addTextOutput('Compilation Date : ' + GALENA_COMPILATION_DATE);
+        } catch (err) {
+            this.addErrorTextOutput('No Compilation Date Found!');
+        }
         this.addTextOutput('');
     }
     getOutputSize = function () {
@@ -410,6 +416,7 @@ class  Terminal {
                 return this.gross;
             },
             draw: function (xPos, yPos, area, caller) {
+                area.setColor(caller.getPalette().getTextColor());
                 area.drawText(this.getValue(), xPos, yPos);
             }
         };
@@ -656,6 +663,7 @@ class  Terminal {
             }
         }
         yPos = this.getRowPosition(this.getTextRowCount() - 1);
+        this.getArea().setColor(this.getPalette().getTextColor());
         this.getArea().drawText(this.getFormattedInput(), xPos, yPos);
     }
     setup = function () {
@@ -685,35 +693,54 @@ var TerminalSystem = function (canvas, useVerbose) {
         return this.modes;
     };
     this.addModule = function (toAdd) {
-        toAdd.caller = this;
-        toAdd.getCaller = function () {
-            return this.caller;
-        };
-        var name = toAdd.getName().trim().toUpperCase();
-        this.getModes()[name] = toAdd;
-        if (this.hasMode() === false) {
-            this.setMode(name);
+        try {
+            toAdd.caller = this;
+            toAdd.getCaller = function () {
+                return this.caller;
+            };
+            var name = toAdd.getName().trim().toUpperCase();
+            this.getModes()[name] = toAdd;
+            if (this.hasMode() === false) {
+                this.setMode(name);
+            }
+        } catch (err) {
+            this.printErrorText(err + '');
         }
     };
     this.hasMode = function () {
         return genUtils.isNull(this.getMode()) !== true;
     };
     this.executeModeCommand = function (cmd) {
-        if (genUtils.isNull(this.getMode) === true) {
-            throw 'No mode has been selected!';
+        try {
+            if (genUtils.isNull(this.getMode) === true) {
+                throw 'No mode has been selected!';
+            }
+            this.getModes()[this.getMode()].execute(cmd);
+        } catch (err) {
+            throw err;
         }
-        this.getModes()[this.getMode()].execute(cmd);
     };
     this.getMode = function () {
         return this.mode;
     };
     this.setMode = function (toSet) {
-        toSet = toSet + '';
-        toSet = toSet.trim().toUpperCase();
-        if (genUtils.isNull(this.getModes()[toSet]) === true) {
-            throw toSet + ' is not a valid mode!';
+        var orig = this.getMode();
+        try {
+            toSet = toSet + '';
+            toSet = toSet.trim().toUpperCase();
+            if (genUtils.isNull(this.getModes()[toSet]) === true) {
+                throw toSet + ' is not a valid mode!';
+            }
+            this.mode = toSet;
+            this.getModes()[this.getMode()].activate(this);
+            if (this.getModes()[this.getMode()].hasIntroText()) {
+                this.printAlertText(this.getModes()[this.getMode()].getIntroText());
+            }
+        } catch (err) {
+            this.printErrorText(err + '');
+            this.mode = orig;
+            this.printErrorText('Mode reset to ' + this.getMode() + '!');
         }
-        this.mode = toSet;
     };
     this.getSystemKey = function () {
         return this.systemKey;
@@ -875,7 +902,7 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.printText('Registered modes:');
             for (var mode in this.getModes()) {
                 if (this.getMode() === mode) {
-                    this.printText('   ' + mode + ' <- CURRENT');
+                    this.printAlertText('   ' + mode + ' <- CURRENT');
                 } else
                 {
                     this.printText('   ' + mode);
@@ -1263,12 +1290,28 @@ var KeySet = function () {
 class BaseModule {
     constructor(name) {
         this.name = name;
+        this.introText = '';
+        this.activateText = '';
     }
     getName = function () {
         return this.name;
     }
     execute = function () {
-        this.getCaller().printText(this.getName() + ' has not been initalized yet!');
+        throw  this.getName() + ' has not been initalized yet!';
+    }
+    hasIntroText = function () {
+        return this.getIntroText().length > 0;
+    }
+    getIntroText = function () {
+        return this.introText;
+    }
+    activate = function (caller) {
+    }
+    getActivateText = function () {
+        return this.activateText;
+    }
+    hasActivateText = function () {
+        return this.getActivateText().length > 0;
     }
 }
 
