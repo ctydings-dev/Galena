@@ -177,7 +177,7 @@ class  Terminal {
         };
 
 
-
+        this.paint();
 
     }
 
@@ -245,6 +245,8 @@ class  Terminal {
 
         };
         this.addOutput(toAdd);
+
+        this.paint();
         return toAdd;
     }
 

@@ -102,10 +102,58 @@ class SQLModule extends BaseModule {
 
     }
 
+    exportDBToLocalFile = function (fileName) {
+
+
+
+        var data = this.exportDB();
+        data = 'var loadParsedData = function(db){\nvar data = '
+                + this.formatDBData(data);
+
+        data = data + ';\n db.loadDatabase(data);}';
+
+
+
+
+        data = [data];
+        this.getCaller().downloadToLocal(data, fileName);
+    }
+
     moduleCmd = function (input) {
 
         var cmd = input.trim();
         var toCheck = cmd.toUpperCase();
+
+
+
+        if (toCheck.indexOf('EXPORT_LOADER') === 0) {
+
+            cmd = cmd.trim();
+
+
+            var fileName = cmd.substring(13).trim();
+            if (fileName.length < 1) {
+
+                this.getCaller().printErrorText('No file name given!');
+                return;
+
+            }
+
+
+
+
+            this.exportDBToLocalFile(fileName);
+            this.getCaller().printAlertText('Database exported to ' + fileName + '.');
+            return true;
+        }
+
+
+
+
+
+
+
+
 
         if (toCheck.indexOf('EXPORT') === 0) {
 
@@ -119,6 +167,8 @@ class SQLModule extends BaseModule {
                 return;
 
             }
+
+
 
 
             this.exportDBToLocal(fileName);
