@@ -94,13 +94,17 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.appendInput = function (toAppend) {
         this.getTerminal().appendInput(toAppend);
     };
+
+
+
+
     this.processDownEvent = function (event) {
 
         var value = this.getKeySet().processDownEvent(event);
 
         if (value.isUnknown() === true) {
 
-            this.printText(value.getValue() + ' is not a recognized key!');
+            this.printErrorText(value.getValue() + ' is not a recognized key!');
             this.paint();
             return;
         }
@@ -292,6 +296,30 @@ var TerminalSystem = function (canvas, useVerbose) {
             return;
         }
 
+        if (broken[0] === 'OUTPUT_SIZE') {
+
+            if (broken.length !== 2 || Number.isNaN(broken[1]))
+            {
+                this.printErrorText('A positive number must be provided!');
+                return;
+            }
+
+            var size = Number(broken[1]);
+
+            if (genUtils.isNull(size) === true || Number.isNaN(size) === true || size < 1) {
+                this.printErrorText('A positive number must be provided!');
+                return;
+            }
+            this.getTerminal().setOutputLimit(size);
+            this.printVerbose('Output size set to ' + size + '.');
+
+            return;
+        }
+
+
+
+
+
         if (broken[0] === 'HELP') {
 
             if (broken.length > 1) {
@@ -315,7 +343,7 @@ var TerminalSystem = function (canvas, useVerbose) {
 
             }
 
-
+            this.printSystemHelp();
             this.getMode().printHelp();
 
 
@@ -521,6 +549,36 @@ save function!');
 
 
     };
+
+
+    this.printSystemHelp = function () {
+
+        this.printText('The Galean Terminal System is a text based system. To use, simply type in the desired command. The current output appears in the bottom of the screen. Colors are used to denote message types');
+        this.printAlertText('This is an alert message.');
+        this.printErrorText('This is an error message!');
+        this.printText('');
+        this.printText('Modes');
+        this.printText('Most functionality is based in the modules loaded' +
+                ' into the system. Except for system commands,' +
+                ' described below, most inputs are handled by this modules.' +
+                ' Please see the module specific help contents for further'
+                + ' information.');
+
+        this.printText('');
+        this.printText('Controls');
+        this.printText("Beyond the alpha numberic keys, the arrow and shift keys can be used to interact with the system. The right and left arrows reposition the cursor on the input. The up and down arrows adjust the output text. If the shift key is held, then the up and down arrows set the input to previous inputs.");
+
+        this.printText('System Commands');
+        this.printText('System commands are entered by typing \'!\' followed, without a space, by the name of the command. Parameters follow separatede by a space.');
+
+
+
+
+
+    }
+
+
+
     var caller = this;
     window.addEventListener("keydown", function () {
         caller.processDownEvent(event);
