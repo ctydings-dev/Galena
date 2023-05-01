@@ -1,9 +1,9 @@
 /**
  * Galena Terminal System(GTS) Distribution File
  * (c) 2023 Christopher Tydings
- * Dist Creation Timestamp : 2023-04-26_06-12-27
+ * Dist Creation Timestamp : 2023-04-30_21-43-09
  */
-const GALENA_COMPILATION_DATE = '2023-04-26_06-12-27';
+const GALENA_COMPILATION_DATE = '2023-04-30_21-43-09';
 const genUtils = {
     isNull: function (toTest) {
         if (toTest === false) {
@@ -1848,6 +1848,635 @@ class TextTable {
             ret.push(this.rowToString(data[col]), this.getVerticalBorder());
         }
         return ret;
+    }
+}
+
+class JSONModule extends BaseModule {
+    constructor() {
+        super('JSON');
+        this.source = [];
+    }
+    getSource = function () {
+        return this.source;
+    }
+    addToSource = function (toAdd) {
+        this.getSource().push(toAdd);
+    }
+    execute = function (cmd, entry) {
+    }
+    print = function (text) {
+        this.getCaller().printText(text);
+    }
+    printResults = function (cols, results) {
+        if (results.length < 1) {
+            return;
+        }
+        var tab = new TextTable(cols);
+        for (var index = 0; index < results.length; index++) {
+            if (results[index].isArray() === true) {
+                for (var sub = 0; sub < results[index].length(); sub++) {
+                    results[index].at(sub).addToTable(tab, index, sub);
+                }
+            } else
+            {
+                results[index].addToTable(tab, index, 0);
+            }
+        }
+        this.getCaller().printTable(tab);
+    }
+    length = function () {
+        return this.getSource().length;
+    }
+    at = function (index) {
+        var xml = this.getSource()[index];
+        return xml;
+    }
+    runCmd = function (cmd, index) {
+        cmd.setSource(this.at(index));
+        return cmd.execute(this);
+    }
+    execute = function (cmd, print) {
+        try {
+            var parser = new CommandParser();
+            var cmd = parser.parse(cmd);
+            var results = [];
+            var cols = [];
+            if (cmd.length() > 0) {
+                for (var index = 0; index < cmd.length(); index++) {
+                    cols.push(cmd.at(index).getText());
+                }
+            }
+            for (var index = 0; index < this.length(); index++) {
+                var result = this.runCmd(cmd, index);
+                if (genUtils.isNull(result) !== true) {
+                    results.push(result);
+                }
+            }
+            this.printResults(cols, results);
+        } catch (err) {
+            this.getCaller().printErrorText('Error: ' + err);
+        }
+    }
+}
+
+class SuperString {
+    constructor(value) {
+        this.value = value + '';
+        this.special = [];
+        this.calcStatus();
+    }
+    makeSpecial = function (index) {
+        if (genUtils.isNull(this.special[index]) === false) {
+            return;
+        }
+        this.special[index] = {
+            print: true,
+            ignore: false,
+            comment: false
+        };
+    }
+    ignore = function (index) {
+        this.getSpecial(index).ignore = true;
+    }
+    comment = function (index) {
+        this.getSpecial(index).comment = true;
+    }
+    noPrint = function (index) {
+        this.getSpecial(index).print = false;
+    }
+    getSpecial = function (index) {
+        if (genUtils.isNull(this.special[index]) === true) {
+            this.makeSpecial(index);
+        }
+        return this.special[index];
+    }
+    isIgnore = function (index) {
+        return this.getSpecial(index).ignore === true;
+    }
+    isComment = function (index) {
+        return  this.getSpecial(index).comment === true;
+    }
+    isNoPrint = function (index) {
+        return this.getSpecial(index).print === false;
+    }
+    length = function () {
+        return this.getValue().length;
+    }
+    at = function (position) {
+        return this.getValue()[position];
+    }
+    contains = function (target) {
+        return this.indexOf(target) >= 0;
+    }
+    calcStatus = function () {
+        var cmt = null;
+        for (var index = 0; index < this.length(); index++)
+        {
+            if (this.isIgnore(index) === false)
+            {
+                var temp = this.at(index);
+                if (this.at(index) === '\\') {
+                    if (index + 1 < this.length()) {
+                        this.ignore(index + 1);
+                        this.noPrint(index);
+                    } else
+                    {
+                        throw 'Illegal Escape';
+                    }
+                }
+                if (genUtils.isNull(cmt) === true) {
+                    if (this.at(index) === "'" || this.at(index) === '"') {
+                        this.comment(index);
+                        cmt = this.at(index);
+                        this.noPrint(index);
+                    }
+                } else
+                {
+                    this.comment(index);
+                    if (this.at(index) === cmt) {
+                        this.noPrint(index);
+                        cmt = null;
+                    }
+                }
+            }
+        }
+    }
+    print = function (start, end) {
+        if (genUtils.isNull(start) === true) {
+            start = 0;
+        }
+        if (genUtils.isNull(end) === true) {
+            end = this.length();
+        }
+        var ret = '';
+        for (var index = start; index < end; index++) {
+            var print = this.isNoPrint(index);
+            var toPrint = this.at(index);
+            if (print === false) {
+                ret += toPrint;
+            }
+        }
+        return ret;
+    }
+    isValid = function (index) {
+        if (this.isComment(index) === true) {
+            return false;
+        }
+        if (this.isIgnore(index) === true) {
+            return false;
+        }
+        return true;
+    }
+    createSub = function (start, end) {
+        var sub = this.getValue().substring(start, end);
+        sub = new SuperString(sub);
+        var counter = 0;
+        for (var index = start; index < end; index++) {
+            sub.special[counter] = this.getSpecial(index);
+            counter++;
+        }
+        return sub;
+    }
+    indexOf = function (target, start) {
+        if (genUtils.isNull(start) === true) {
+            start = 0;
+        }
+        for (var index = 0; index < this.length(); index++)
+        {
+            if (this.isComment(index) === false && this.isIgnore(index) === false) {
+                if (this.at(index) === target) {
+                    return index;
+                }
+            }
+        }
+        return -1;
+    }
+    getValue = function () {
+        return this.value;
+    }
+}
+
+class CommandValue {
+    constructor(value) {
+        this.value = value;
+    }
+    isTrue = function () {
+        return false;
+    }
+    getValue = function () {
+        return this.value;
+    }
+    getText = function () {
+        try {
+            return this.getValue().print();
+        } catch (err) {
+        }
+        return this.value + '';
+    }
+    isCommand = function () {
+        return false;
+    }
+    isArray = function () {
+        return false;
+    }
+    isQuote = function () {
+        return false;
+    }
+    addToTable = function (table, row, col) {
+        table.setCell(row, col, this.getText());
+    }
+}
+
+class CommandArray extends  CommandValue
+{
+    constructor() {
+        super([]);
+    }
+    isArray = function () {
+        return true;
+    }
+    length = function () {
+        return this.getValue().length;
+    }
+    at = function (index) {
+        index = Number(index);
+        if (index < 0 || index >= this.length()) {
+            throw 'Index ' + index + ' is out of bounds!';
+        }
+        return this.getValue()[index];
+    }
+    push = function (toAdd) {
+        if (genUtils.isNull(toAdd) === true) {
+            this.value.push(toAdd);
+            return;
+        }
+        if (genUtils.isNull(toAdd.value) === true) {
+            toAdd = new CommandValue(toAdd);
+        }
+        this.value.push(toAdd);
+    }
+}
+
+class CommandQuote extends  CommandValue
+{
+    constructor(value) {
+        super(value);
+    }
+    isQuote = function () {
+        return true;
+    }
+}
+
+class Command extends CommandArray {
+    constructor(name) {
+        super();
+        this.name = name;
+    }
+    addArg = function (toAdd) {
+        this.push(toAdd);
+    }
+    getArgs = function () {
+        return this.value;
+    }
+    length = function () {
+        return this.getArgs().length;
+    }
+    getArg = function (index) {
+        if (index < 0 || index >= this.length()) {
+            throw 'Out of bounds index!';
+        }
+        return this.getArgs()[index];
+    }
+    getName = function () {
+        return this.name;
+    }
+    at = function (index) {
+        return this.getArg(index);
+    }
+    isBoolean = function () {
+        return false;
+    }
+    getValue = function (caller) {
+        return this.execute(caller);
+    }
+    execute = function (caller) {
+        throw 'Not yet implemented!';
+    }
+}
+
+class CommandParser {
+    constructor() {
+    }
+    parse = function (value) {
+        value = new SuperString(value);
+        var start = value.indexOf('(');
+        if (start < 1) {
+            throw 'Is not a function';
+        }
+        var name = value.createSub(0, start).print();
+        var ret = new Command(name);
+        var rem = value.createSub(start, value.length());
+        var index = this.getFuncEnd(rem);
+        rem = rem.createSub(1, index);
+        index = this.getParamEnd(rem);
+        while (index > 0) {
+            var first = rem.createSub(0, index);
+            rem = rem.createSub(index + 1);
+            ret.addArg(this.parseParam(first));
+            index = this.getParamEnd(rem);
+        }
+        if (rem.length() > 0) {
+            ret.addArg(this.parseParam(rem));
+        }
+        return this.convertCommand(ret);
+    }
+    parseParam = function (input) {
+        if (this.isComment(input) === true)
+        {
+            return new CommandQuote(input.print());
+        }
+        if (input.contains('(') === true) {
+            return this.parse(input.getValue());
+        }
+        var ret = new CommandValue(input.print());
+        return ret;
+    }
+    convertCommand = function (toConvert) {
+        var ret = null;
+        var name = toConvert.getName();
+        name = name.trim().toUpperCase();
+        if (name === 'JSON') {
+            ret = new JSONValueCommand();
+        }
+        if (name === 'IF') {
+            ret = new IFCommand();
+        }
+        if (name === 'NULL') {
+            ret = new IsNullValueCommand();
+        }
+        if (name === 'TREE') {
+            ret = new JSONTreeCommand();
+        }
+        if (genUtils.isNull(ret) === true) {
+            throw name + ' is not a recognized command!';
+        }
+        ret.value = toConvert.value;
+        return ret;
+    }
+    isComment = function (toTest) {
+        if (toTest.length() < 1) {
+            return false;
+        }
+        var isCmt = toTest.isComment(0);
+        for (var index = 0; index < toTest.length(); index++)
+        {
+            if (isCmt !== toTest.isComment(index))
+            {
+                throw 'Comment mismatch!';
+            }
+        }
+        return isCmt;
+    }
+    getParamEnd = function (input) {
+        var counter = 0;
+        for (var index = 0; index < input.length(); index++) {
+            if (input.isValid(index) === true) {
+                if (input.at(index) === '(') {
+                    counter++;
+                }
+                if (input.at(index) === ')') {
+                    counter--;
+                }
+                if (counter === 0) {
+                    if (input.at(index) === ',') {
+                        return index;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+    getFuncEnd = function (input) {
+        var counter = 0;
+        for (var index = 0; index < input.length(); index++) {
+            if (input.isValid(index) === true) {
+                if (input.at(index) === '(') {
+                    counter++;
+                }
+                if (input.at(index) === ')') {
+                    counter--;
+                }
+                if (counter === 0) {
+                    return index;
+                }
+            }
+        }
+        throw 'Parenthesis mismatch!';
+    }
+}
+
+class BooleanCommand extends Command {
+    constructor(name) {
+        super(name);
+    }
+    isTrue = function () {
+        return false;
+    }
+    isBoolean = function () {
+        return false;
+    }
+}
+
+class CompareCommand extends BooleanCommand {
+    constructor(name) {
+        super(name);
+    }
+    compare = function (valueA, valueB, caller) {
+        throw 'Unimplmented comparison command.';
+    }
+    isTrue = function (caller) {
+        if (this.length() < 2) {
+            throw 'Insufficent argument count exception!'
+        }
+        var base = this.at(0).getValue();
+        for (var index = 1; index < this.length(); index++) {
+            if (this.compare(base, this.at(index).getValue(), caller) === false) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+class IfCommand extends BooleanCommand {
+    constructor() {
+        super('IF');
+    }
+    isTrue = function (caller) {
+        if (this.at(0).getValue() === true) {
+            return true;
+        }
+        return false;
+    }
+    getSource = function () {
+        return this.source;
+    }
+    setSource = function (toSet) {
+        this.source = toSet;
+    }
+    execute = function (caller) {
+        if (this.length() < 1) {
+            throw 'No boolean condition in statement!';
+        }
+        var ret = [];
+        if (this.isTrue(caller) === false) {
+            return ret;
+        }
+        for (var index = 1; index < this.length(); index++) {
+            var child = this.getArg(index);
+            if (child.isQuote() === false &&
+                    child.isArray() === false) {
+                var sub = new JSONValueCommand();
+                sub.addArg(child.getValue());
+                ret.push(sub.getValue());
+            } else {
+                child.setSource(this.getSource());
+                ret.push(child.getValue(caller));
+            }
+        }
+    }
+}
+
+class EqualsCommand extends BooleanCommand {
+    constructor() {
+        super('EQ');
+    }
+    compare = function (valueA, valueB, caller) {
+        return valueA === valueB;
+    }
+}
+
+class GreaterThanCommand extends BooleanCommand {
+    constructor() {
+        super('LD');
+    }
+    compare = function (valueA, valueB, caller) {
+        return valueA > valueB;
+    }
+}
+
+class IsNotNullCommand extends BooleanCommand {
+    constructor() {
+        super('EXISTS');
+    }
+    isTrue = function (caller) {
+        if (this.length() < 1) {
+            throw 'Insufficent argument count exception!'
+        }
+        var base = this.at(0).getValue();
+        return genUtils.isNull(base) !== true;
+    }
+}
+
+class IsNullCommand extends BooleanCommand {
+    constructor() {
+        super('null');
+    }
+    isTrue = function (caller) {
+        if (this.length() < 1) {
+            throw 'Insufficent argument count exception!'
+        }
+        var base = this.at(0).getValue();
+        return genUtils.isNull(base) === true;
+    }
+}
+
+class JSONValueCommand extends Command {
+    constructor() {
+        super('JSON');
+        this.source = null;
+    }
+    parsePath = function (path) {
+        var ret = genUtils.breakupString(path, '.');
+        return ret;
+    }
+    setSource = function (toSet) {
+        this.source = toSet;
+    }
+    getSource = function () {
+        if (genUtils.isNull(this.source) === true) {
+            throw 'No source!';
+        }
+        return this.source;
+    }
+    getPath = function (path) {
+        var curr = this.getSource();
+        path = this.parsePath(path.getValue());
+        for (var index = 0; index < path.length; index++) {
+            var child = path[index];
+            curr = curr[child];
+            if (genUtils.isNull(curr) === true) {
+                return null;
+            }
+        }
+        return new CommandValue(new SuperString(curr));
+    }
+    execute = function () {
+        var ret = new CommandArray();
+        if (this.length() === 1) {
+            return this.getPath(this.getArg(0));
+        }
+        for (var index = 0; index < this.length(); index++) {
+            ret.push(this.getPath(this.getArg(index)));
+        }
+        return ret;
+    }
+}
+
+class LessThanCommand extends BooleanCommand {
+    constructor() {
+        super('LD');
+    }
+    compare = function (valueA, valueB, caller) {
+        return valueA < valueB;
+    }
+}
+
+class JSONTreeCommand extends Command {
+    constructor() {
+        super('TREE');
+        this.source = null;
+    }
+    setSource = function (toSet) {
+        this.source = toSet;
+    }
+    getSource = function () {
+        if (genUtils.isNull(this.source) === true) {
+            throw 'No source!';
+        }
+        return this.source;
+    }
+    parseObj = function (input, caller, padding, limit) {
+        if (limit < 0) {
+            return;
+        }
+        for (var prop in input) {
+            caller.print(padding + prop);
+            var sub = input[prop];
+            if (sub !== (sub + '')) {
+                this.parseObj(sub, caller, padding + '  ', limit - 1);
+            }
+        }
+    }
+    execute = function (caller) {
+        if (this.length() === 1) {
+            if (this.getArg(0).getValue() < 1) {
+                return;
+            }
+        }
+        this.parseObj(this.getSource(), caller, ' ', 10);
+        this.addArg(new CommandValue(0));
+        return null;
     }
 }
 
