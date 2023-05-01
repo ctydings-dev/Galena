@@ -26,4 +26,8 @@ class CommandArray extends  CommandValue
         return this.getValue()[index];
     }
 
+    push = function (toAdd) {
+        this.getValue().push(toAdd);
+    }
+
 }

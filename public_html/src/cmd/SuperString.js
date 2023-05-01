@@ -75,6 +75,11 @@ class SuperString {
 
     }
 
+    contains = function (target) {
+        return this.indexOf(target) >= 0;
+
+    }
+
     calcStatus = function () {
         var cmt = null;
 
