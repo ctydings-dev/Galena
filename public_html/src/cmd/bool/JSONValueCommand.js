@@ -26,7 +26,7 @@ class JSONValueCommand extends Command {
 
         var curr = this.getSource();
 
-        path = this.parsePath(path);
+        path = this.parsePath(path.getValue());
 
         for (var index = 0; index < path.length; index++) {
             var child = path[index];
@@ -41,7 +41,7 @@ class JSONValueCommand extends Command {
         }
 
 
-        return new CommandValue(curr);
+        return new CommandValue(new SuperString(curr));
     }
 
     execute = function () {
@@ -50,12 +50,12 @@ class JSONValueCommand extends Command {
 
 
         if (this.length() === 1) {
-            return new CommandValue(this.getPath(this.getArg(0)));
+            return this.getPath(this.getArg(0));
         }
 
 
-        for (var index = 0; index < this.length; index++) {
-            ret.push(this.getPath()(this.getArg(index)));
+        for (var index = 0; index < this.length(); index++) {
+            ret.push(this.getPath(this.getArg(index)));
         }
         return ret;
 

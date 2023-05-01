@@ -27,7 +27,21 @@ class CommandArray extends  CommandValue
     }
 
     push = function (toAdd) {
-        this.getValue().push(toAdd);
+
+        if (genUtils.isNull(toAdd) === true) {
+
+            this.value.push(toAdd);
+            return;
+        }
+
+        if (genUtils.isNull(toAdd.value) === true) {
+
+            toAdd = new CommandValue(toAdd);
+
+        }
+
+
+        this.value.push(toAdd);
     }
 
 }

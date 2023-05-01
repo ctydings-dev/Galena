@@ -5,8 +5,24 @@ class CommandValue {
 
     }
 
+    isTrue = function () {
+        return false;
+    }
+
     getValue = function () {
+
         return this.value;
+    }
+
+    getText = function () {
+
+        try {
+            return this.getValue().print();
+        } catch (err) {
+
+        }
+        return this.value + '';
+
     }
 
     isCommand = function () {
@@ -21,6 +37,12 @@ class CommandValue {
 
     isQuote = function () {
         return false;
+    }
+
+    addToTable = function (table, row, col) {
+        table.setCell(row, col, this.getText());
+
+
     }
 
 }

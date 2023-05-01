@@ -1,4 +1,4 @@
-class IsNullCommand extends BooleanCommand {
+class IsNotNullCommand extends BooleanCommand {
 
     constructor() {
         super('EXISTS');

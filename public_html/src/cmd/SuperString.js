@@ -154,11 +154,9 @@ class SuperString {
         var ret = '';
         for (var index = start; index < end; index++) {
             var print = this.isNoPrint(index);
-            var toPrint = this.at(index).toUpperCase();
+            var toPrint = this.at(index);
 
-            if (this.isComment(index) === true) {
-                toPrint = toPrint.toLowerCase();
-            }
+
 
             if (print === false) {
                 ret += toPrint;

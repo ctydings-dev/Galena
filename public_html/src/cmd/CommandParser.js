@@ -42,7 +42,7 @@ class CommandParser {
         }
 
 
-        return ret;
+        return this.convertCommand(ret);
 
     }
 
@@ -68,6 +68,47 @@ class CommandParser {
 
 
         return ret;
+    }
+
+    convertCommand = function (toConvert) {
+
+        var ret = null;
+        var name = toConvert.getName();
+        name = name.trim().toUpperCase();
+
+
+        if (name === 'JSON') {
+
+            ret = new JSONValueCommand();
+
+        }
+
+        if (name === 'IF') {
+
+            ret = new IFCommand();
+
+        }
+        if (name === 'NULL') {
+
+            ret = new IsNullValueCommand();
+
+        }
+
+        if (name === 'TREE') {
+
+            ret = new JSONTreeCommand();
+        }
+
+
+
+        if (genUtils.isNull(ret) === true) {
+            throw name + ' is not a recognized command!';
+        }
+
+        ret.value = toConvert.value;
+
+        return ret;
+
     }
 
     isComment = function (toTest) {

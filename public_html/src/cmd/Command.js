@@ -8,11 +8,15 @@ class Command extends CommandArray {
     }
 
     addArg = function (toAdd) {
-        this.getArgs().push(toAdd);
+        this.push(toAdd);
     }
 
     getArgs = function () {
         return this.value;
+    }
+
+    length = function () {
+        return this.getArgs().length;
     }
 
     getArg = function (index) {
