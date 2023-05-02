@@ -106,5 +106,28 @@ const genUtils = {
             second: ''
         };
         return ret;
+    },
+
+    replaceInString(input, target, rep) {
+        var targetLength = target.length;
+        var ret = '';
+        var index = input.indexOf(target);
+
+        while (index > 0) {
+
+            var toAdd = input.substring(0, index);
+            input = input.substring(index + targetLength);
+            ret = ret + toAdd + rep;
+            index = input.indexOf(target);
+        }
+
+        if (input.length > 0) {
+            ret = ret + input;
+        }
+        return ret;
     }
+
+
+
+
 };

@@ -1,4 +1,4 @@
-class LessThanCommand extends BooleanCommand {
+class GreaterThanCommand extends BooleanCommand {
 
     constructor() {
         super('LD');

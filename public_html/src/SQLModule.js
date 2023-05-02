@@ -193,7 +193,7 @@ class SQLModule extends BaseModule {
         return false;
     }
 
-    execute = function (cmd, print) {
+    execute = function (rt) {
 
         if (genUtils.isNull(print) === true) {
             print = true;
