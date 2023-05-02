@@ -1,10 +1,10 @@
 /**
  * Galena Terminal System(GTS) Distribution File
  * (c) 2023 Christopher Tydings
- * Dist Creation Timestamp : 2023-05-01_18-30-48
+ * Dist Creation Timestamp : 2023-05-01_18-37-40
  * Caveat Emptor
  */
-const GALENA_COMPILATION_DATE = '2023-05-01_18-30-48';
+const GALENA_COMPILATION_DATE = '2023-05-01_18-37-40';
 const genUtils = {
     isNull: function (toTest) {
         if (toTest === false) {
@@ -1532,7 +1532,7 @@ class SQLModule extends BaseModule {
         }
         return false;
     }
-    execute = function (rt) {
+    execute = function (cmd) {
         if (genUtils.isNull(print) === true) {
             print = true;
         }
