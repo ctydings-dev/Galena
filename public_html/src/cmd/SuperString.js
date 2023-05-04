@@ -66,6 +66,50 @@ class SuperString {
 
     }
 
+    isStringComment = function () {
+
+        var ret = false;
+
+
+        for (var index = 0; index < this.length(); index++) {
+
+            if (this.at(index) !== ' ') {
+                if (this.isIgnore(index) === false) {
+
+                    if (this.isComment(index) === true) {
+                        ret = true;
+
+
+
+
+                    } else
+                    {
+
+                        if (ret === true) {
+                            throw 'Comment mismatch!';
+                        }
+
+                    }
+
+
+
+                }
+
+
+
+
+            }
+
+
+
+        }
+
+
+        return ret;
+
+
+    }
+
     length = function () {
         return this.getValue().length;
     }
@@ -103,7 +147,7 @@ class SuperString {
                 if (genUtils.isNull(cmt) === true) {
 
 
-                    if (this.at(index) === "'" || this.at(index) === '"') {
+                    if (this.at(index) === "'" || this.at(index) === '"' || this.at(index) === "“") {
                         this.comment(index);
                         cmt = this.at(index);
                         this.noPrint(index);
