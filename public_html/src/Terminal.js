@@ -211,7 +211,12 @@ class  Terminal {
 
     }
 
-    addTextOutput = function (text) {
+    addTextOutput = function (text, options) {
+
+        if (genUtils.isNull(options) === true) {
+            options = {};
+        }
+
         while (text.length > this.getTextColCount()) {
             /* var sub = text.substring(0, this.getTextColCount());
              text = text.substring(this.getTextColCount());
@@ -219,10 +224,12 @@ class  Terminal {
              */
             var broken = genUtils.smartBreakup(text, this.getTextColCount());
 
-            this.addTextOutput(broken.first);
+            this.addTextOutput(broken.first, options);
             text = broken.second;
 
         }
+
+
 
         var gross = this.getPalette().getFontHeight() * 1.0;
         var toAdd = {
@@ -246,7 +253,10 @@ class  Terminal {
         };
         this.addOutput(toAdd);
 
-        this.paint();
+
+        if (options.ignorePrint !== true) {
+            this.paint();
+        }
         return toAdd;
     }
 

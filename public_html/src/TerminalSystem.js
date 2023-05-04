@@ -228,10 +228,13 @@ var TerminalSystem = function (canvas, useVerbose) {
 
 
     this.printArray = function (toPrint) {
+        var options = {
+            ignorePrint: true
 
+        }
 
         for (var index = 0; index < toPrint.length; index++) {
-            this.printText(toPrint[index] + '');
+            this.printText(toPrint[index] + '', options);
         }
 
     };

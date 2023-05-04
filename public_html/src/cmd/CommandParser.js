@@ -99,6 +99,12 @@ class CommandParser {
             ret = new JSONTreeCommand();
         }
 
+        if (name === 'SQL_TABLE') {
+
+            ret = new CreateSQLTableCommand();
+        }
+
+
 
 
         if (genUtils.isNull(ret) === true) {
@@ -112,22 +118,7 @@ class CommandParser {
     }
 
     isComment = function (toTest) {
-        if (toTest.length() < 1) {
-            return false;
-        }
-
-        var isCmt = toTest.isComment(0);
-
-        for (var index = 0; index < toTest.length(); index++)
-        {
-
-            if (isCmt !== toTest.isComment(index))
-            {
-                throw 'Comment mismatch!';
-            }
-
-        }
-        return isCmt;
+        return toTest.isStringComment();
     }
 
     getParamEnd = function (input) {
