@@ -1,6 +1,10 @@
 class CommandValue {
 
     constructor(value) {
+        if (typeof value === 'string') {
+            value = new SuperString(value);
+        }
+
         this.value = value;
 
     }

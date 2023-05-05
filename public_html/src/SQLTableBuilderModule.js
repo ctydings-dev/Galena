@@ -17,8 +17,16 @@ class SQLTableBuilderModule extends BaseModule {
     }
 
     executeSQLCmd = function (cmd) {
-        //  this.getSQL().execute(cmd);
-        alert(cmd);
+
+        this.getSQL().execute(cmd);
+    }
+
+    getSource = function () {
+        return this.source;
+    }
+
+    setSource = function (toSet) {
+        this.source = toSet;
     }
 
     execute = function (cmd) {
@@ -26,6 +34,7 @@ class SQLTableBuilderModule extends BaseModule {
 
             var parser = new CommandParser();
             var parsed = parser.parse(cmd);
+            parsed.setSource(this.getSource());
             parsed.execute(this);
 
 

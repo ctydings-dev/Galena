@@ -31,6 +31,10 @@ class SuperString {
 
     }
 
+    isSuperString = function () {
+        return true;
+    }
+
     comment = function (index) {
         this.getSpecial(index).comment = true;
     }

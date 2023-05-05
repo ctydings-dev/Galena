@@ -26,7 +26,7 @@ class JSONValueCommand extends Command {
 
         var curr = this.getSource();
 
-        path = this.parsePath(path.getValue());
+        path = this.parsePath(path.getText());
 
         for (var index = 0; index < path.length; index++) {
             var child = path[index];
@@ -36,6 +36,23 @@ class JSONValueCommand extends Command {
                 return null;
             }
 
+
+
+        }
+
+        if (Array.isArray(curr) === true) {
+            var ret = new CommandArray();
+
+            for (var index = 0; index < curr.length; index++) {
+
+
+
+
+
+                ret.push(curr[index]);
+
+            }
+            return ret;
 
 
         }
