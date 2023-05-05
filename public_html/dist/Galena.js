@@ -1,10 +1,10 @@
 /**
  * Galena Terminal System(GTS) Distribution File
  * (c) 2023 Christopher Tydings
- * Dist Creation Timestamp : 2023-05-01_18-37-40
+ * Dist Creation Timestamp : 2023-05-05_01-48-45
  * Caveat Emptor
  */
-const GALENA_COMPILATION_DATE = '2023-05-01_18-37-40';
+const GALENA_COMPILATION_DATE = '2023-05-05_01-48-45';
 const genUtils = {
     isNull: function (toTest) {
         if (toTest === false) {
@@ -450,14 +450,17 @@ class  Terminal {
         this.addColorTextOutput(text, source);
         return;
     }
-    addTextOutput = function (text) {
+    addTextOutput = function (text, options) {
+        if (genUtils.isNull(options) === true) {
+            options = {};
+        }
         while (text.length > this.getTextColCount()) {
             /* var sub = text.substring(0, this.getTextColCount());
              text = text.substring(this.getTextColCount());
              this.addTextOutput(sub);
              */
             var broken = genUtils.smartBreakup(text, this.getTextColCount());
-            this.addTextOutput(broken.first);
+            this.addTextOutput(broken.first, options);
             text = broken.second;
         }
         var gross = this.getPalette().getFontHeight() * 1.0;
@@ -479,7 +482,9 @@ class  Terminal {
             }
         };
         this.addOutput(toAdd);
-        this.paint();
+        if (options.ignorePrint !== true) {
+            this.paint();
+        }
         return toAdd;
     }
     getOutputAt = function (index) {
@@ -912,8 +917,11 @@ var TerminalSystem = function (canvas, useVerbose) {
         this.printArray(out);
     };
     this.printArray = function (toPrint) {
+        var options = {
+            ignorePrint: true
+        }
         for (var index = 0; index < toPrint.length; index++) {
-            this.printText(toPrint[index] + '');
+            this.printText(toPrint[index] + '', options);
         }
     };
     this.downloadImageToLocal = function (fileName) {
@@ -1935,6 +1943,38 @@ class JSONModule extends BaseModule {
     }
 }
 
+class SQLTableBuilderModule extends BaseModule {
+    constructor(sql) {
+        super('SQL_TABLE');
+        this.sql = sql;
+    }
+    getSQL = function () {
+        return this.sql;
+    }
+    reloadDB = function () {
+        this.getSQL().reloadDB();
+    }
+    executeSQLCmd = function (cmd) {
+        this.getSQL().execute(cmd);
+    }
+    getSource = function () {
+        return this.source;
+    }
+    setSource = function (toSet) {
+        this.source = toSet;
+    }
+    execute = function (cmd) {
+        if (cmd.trim().toUpperCase().indexOf('SQL_TABLE') === 0) {
+            var parser = new CommandParser();
+            var parsed = parser.parse(cmd);
+            parsed.setSource(this.getSource());
+            parsed.execute(this);
+            return;
+        }
+        this.getSQL().execute(cmd);
+    }
+}
+
 class SuperString {
     constructor(value) {
         this.value = value + '';
@@ -1953,6 +1993,9 @@ class SuperString {
     }
     ignore = function (index) {
         this.getSpecial(index).ignore = true;
+    }
+    isSuperString = function () {
+        return true;
     }
     comment = function (index) {
         this.getSpecial(index).comment = true;
@@ -1974,6 +2017,24 @@ class SuperString {
     }
     isNoPrint = function (index) {
         return this.getSpecial(index).print === false;
+    }
+    isStringComment = function () {
+        var ret = false;
+        for (var index = 0; index < this.length(); index++) {
+            if (this.at(index) !== ' ') {
+                if (this.isIgnore(index) === false) {
+                    if (this.isComment(index) === true) {
+                        ret = true;
+                    } else
+                    {
+                        if (ret === true) {
+                            throw 'Comment mismatch!';
+                        }
+                    }
+                }
+            }
+        }
+        return ret;
     }
     length = function () {
         return this.getValue().length;
@@ -2001,7 +2062,7 @@ class SuperString {
                     }
                 }
                 if (genUtils.isNull(cmt) === true) {
-                    if (this.at(index) === "'" || this.at(index) === '"') {
+                    if (this.at(index) === "'" || this.at(index) === '"' || this.at(index) === "“") {
                         this.comment(index);
                         cmt = this.at(index);
                         this.noPrint(index);
@@ -2074,6 +2135,9 @@ class SuperString {
 
 class CommandValue {
     constructor(value) {
+        if (typeof value === 'string') {
+            value = new SuperString(value);
+        }
         this.value = value;
     }
     isTrue = function () {
@@ -2233,6 +2297,9 @@ class CommandParser {
         if (name === 'TREE') {
             ret = new JSONTreeCommand();
         }
+        if (name === 'SQL_TABLE') {
+            ret = new CreateSQLTableCommand();
+        }
         if (genUtils.isNull(ret) === true) {
             throw name + ' is not a recognized command!';
         }
@@ -2240,18 +2307,7 @@ class CommandParser {
         return ret;
     }
     isComment = function (toTest) {
-        if (toTest.length() < 1) {
-            return false;
-        }
-        var isCmt = toTest.isComment(0);
-        for (var index = 0; index < toTest.length(); index++)
-        {
-            if (isCmt !== toTest.isComment(index))
-            {
-                throw 'Comment mismatch!';
-            }
-        }
-        return isCmt;
+        return toTest.isStringComment();
     }
     getParamEnd = function (input) {
         var counter = 0;
@@ -2427,13 +2483,20 @@ class JSONValueCommand extends Command {
     }
     getPath = function (path) {
         var curr = this.getSource();
-        path = this.parsePath(path.getValue());
+        path = this.parsePath(path.getText());
         for (var index = 0; index < path.length; index++) {
             var child = path[index];
             curr = curr[child];
             if (genUtils.isNull(curr) === true) {
                 return null;
             }
+        }
+        if (Array.isArray(curr) === true) {
+            var ret = new CommandArray();
+            for (var index = 0; index < curr.length; index++) {
+                ret.push(curr[index]);
+            }
+            return ret;
         }
         return new CommandValue(new SuperString(curr));
     }
@@ -2493,6 +2556,193 @@ class JSONTreeCommand extends Command {
         this.parseObj(this.getSource(), caller, ' ', 10);
         this.addArg(new CommandValue(0));
         return null;
+    }
+}
+
+class CreateSQLTableCommand extends Command {
+    constructor() {
+        super('SQL_TABLE');
+    }
+    getTableName = function () {
+        return this.getArg(0).getText().trim().toLowerCase();
+    }
+    clearTable = function (caller) {
+        var cmd = 'DROP TABLE IF EXISTS ' + this.getTableName() + ';';
+        caller.executeSQLCmd(cmd);
+    }
+    getFields = function () {
+        var ret = [];
+        var hasArray = -1;
+        for (var index = 1; index < this.length(); index += 1) {
+            var value = this.getArg(index);
+            value = value.getText();
+            value = genUtils.breakupString(value, ' ');
+            var name = value[0];
+            var type = value[1];
+            var isArray = (value[2] + '').trim().toUpperCase() === 'ARRAY';
+            var source = value[3];
+            if (genUtils.isNull(source) === true) {
+                source = name;
+            }
+            if (isArray === true) {
+                if (hasArray >= 0) {
+                    throw 'Only one array table permitted!';
+                }
+                hasArray = ret.length;
+            }
+            if (this.isValidType(type) !== true) {
+                throw type + ' is not a valid type!';
+            }
+            var toAdd = {
+                name: name,
+                type: type,
+                isArray: isArray,
+                source: source
+            };
+            ret.push(toAdd);
+        }
+        if (hasArray >= 0) {
+            var array = ret[hasArray];
+            var sub = [];
+            for (var index = 0; index < ret.length; index++) {
+                if (index !== hasArray) {
+                    sub.push(ret[index]);
+                }
+            }
+            sub.push(array);
+            ret = sub;
+        }
+        return ret;
+    }
+    isValidType = function (type) {
+        type = type.trim().toUpperCase();
+        if (type === 'INTEGER') {
+            return true;
+        }
+        if (type.indexOf('VARCHAR') === 0) {
+            return true;
+        }
+        if (type === 'FLOAT') {
+            return true;
+        }
+        if (type === 'INTEGER') {
+            return true;
+        }
+        if (type === 'BOOL') {
+            return true;
+        }
+        return false;
+    }
+    ignoreErrors = function () {
+        return false;
+    }
+    createInsert = function (caller, fields, source, index) {
+        var cmd = '';
+        try {
+            var isArray = fields[fields.length - 1].isArray === true;
+            if (isArray === true) {
+                if (genUtils.isNull(index) === true) {
+                    index = this.getArrayLength(fields[fields.length - 1].source, source) - 1;
+                    this.createInsert(caller, fields, source, index);
+                    return;
+                }
+                if (index > 0) {
+                    this.createInsert(caller, fields, source, index - 1);
+                }
+            }
+            var end = fields.length;
+            if (isArray === true) {
+                end--;
+            }
+            var values = '';
+            var valueFields = '';
+            for (var sub = 0; sub < end; sub++) {
+                valueFields = valueFields + fields[sub].name + ',';
+                values = values + this.getValue(fields[sub], source) + ',';
+            }
+            if (isArray === true) {
+                valueFields = valueFields + fields[fields.length - 1].name;
+                var value = this.getValue(fields[fields.length - 1], source, index);
+                values = values + value;
+            } else
+            {
+                valueFields = valueFields.substring(0, valueFields.length - 1);
+                values = values.substring(0, values.length - 1);
+            }
+            cmd = 'INSERT INTO ' + this.getTableName() + ' (' + valueFields;
+            cmd = cmd + ') VALUES (' + values + ');';
+            caller.executeSQLCmd(cmd);
+            //
+//  alert(cmd);
+            //    return cmd;
+        } catch (err) {
+            if (this.ignoreErrors() === false) {
+                throw err;
+            }
+        }
+    }
+    getArrayLength = function (name, source) {
+        var cmd = new JSONValueCommand();
+        cmd.addArg(new CommandValue(name));
+        cmd.setSource(source);
+        var value = cmd.execute();
+        return value.length();
+    }
+    parsePath = function (path) {
+        var ret = genUtils.breakupString(path, '.');
+        return ret;
+    }
+    getPath = function (path, curr) {
+        for (var index = 0; index < path.length; index++) {
+            var child = path[index];
+            curr = curr[child];
+            if (genUtils.isNull(curr) === true) {
+                return null;
+            }
+        }
+        return curr;
+    }
+    getValue = function (field, source, index) {
+        var path = this.parsePath(field.source);
+        var value = this.getPath(path, source);
+        if (genUtils.isNull(value) === true) {
+            throw field.source + ' is not a valid field!';
+        }
+        if (index >= 0) {
+            value = value[index];
+        }
+        if (field.type.trim().toUpperCase() === 'BLOB' || field.type.trim().toUpperCase().indexOf('VARCHAR') >= 0) {
+            value = genUtils.replaceInString(value, "'", "''");
+            value = "'" + value + "'";
+        }
+        return value;
+    }
+    createTable = function (caller, fields) {
+        var name = this.getTableName();
+        var cmd = 'CREATE TABLE ' + name + '(id INTEGER PRIMARY KEY';
+        for (var index = 0; index < fields.length; index++) {
+            cmd = cmd + ', ' + fields[index].name + ' ' + fields[index].type;
+        }
+        cmd = cmd + ');';
+        caller.executeSQLCmd(cmd);
+    }
+    getSource = function () {
+        return this.source;
+    }
+    setSource = function (toSet) {
+        this.source = toSet;
+    }
+    execute = function (caller) {
+        if (this.length() < 2) {
+            throw 'Invalid number of arguments!';
+        }
+        var fields = this.getFields();
+        this.clearTable(caller);
+        this.createTable(caller, fields);
+        for (var index = 0; index < this.getSource().length; index++) {
+            var entry = this.getSource()[index];
+            this.createInsert(caller, fields, entry);
+        }
     }
 }
 
