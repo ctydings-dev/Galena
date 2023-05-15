@@ -105,6 +105,11 @@ class CommandParser {
         }
 
 
+        if (name === 'GRAPH') {
+
+            ret = new CreateGraphCommand();
+
+        }
 
 
         if (genUtils.isNull(ret) === true) {

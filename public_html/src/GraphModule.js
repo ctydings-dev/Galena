@@ -15,19 +15,42 @@ class GraphModule extends BaseModule {
         this.introText = 'Graph Mode is using an SQL database.';
     }
 
-    execute = function () {
-        var x = [0, 1, 2, 3, 4, 5];
-        var y = [];
-        for (var index in x)
-        {
-            var toAdd = Math.random() * 10;
-            y.push(toAdd);
+    getDatabase = function () {
+        return this.db;
+    }
 
+    execute = function (cmd) {
+
+        if (cmd.trim().toUpperCase().indexOf('GRAPH') === 0) {
+
+            var parser = new CommandParser();
+            var parsed = parser.parse(cmd);
+            parsed.setSQL(this.getDatabase());
+            // parsed.setSource(this.getSource());
+            parsed.execute(this);
+
+
+            return;
         }
-        var width = this.getCaller().getTerminal().getArea().getWidth() - 20;
-        var height = 125;
-        var grapher = this.createSingleLineGrapher(x, y, width, height);
-        this.createGraphObject(width, height, grapher);
+
+        //   this.getSQL().execute(cmd);
+
+        throw 'Invalid Command!';
+
+
+
+        /*var x = [0, 1, 2, 3, 4, 5];
+         var y = [];
+         for (var index in x)
+         {
+         var toAdd = Math.random() * 10;
+         y.push(toAdd);
+
+         }
+         var width = this.getCaller().getTerminal().getArea().getWidth() - 20;
+         var height = 125;
+         var grapher = this.createSingleLineGrapher(x, y, width, height);
+         this.createGraphObject(width, height, grapher);*/
     }
 
     convertValue = function (value, start, range, length, padding, mirror) {

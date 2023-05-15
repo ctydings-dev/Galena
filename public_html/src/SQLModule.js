@@ -267,6 +267,39 @@ class SQLModule extends BaseModule {
 
     }
 
+    getData = function (cmd) {
+        const stmt = this.getDatabase().prepare(cmd);
+        stmt.getAsObject(); // {col1:1, col2:111}
+
+        // Bind new values
+        stmt.bind();
+
+        var ret = []
+
+        var counter = 0;
+
+
+        while (stmt.step()) { //
+            const row = stmt.getAsObject();
+            var curr = [];
+            var index = 0;
+            for (var prop in row) {
+                var value = row[prop];
+                curr.push(value)
+
+                index++;
+            }
+
+            ret.push(curr);
+
+        }
+
+
+        return ret;
+
+
+    }
+
     printHelp = function () {
         var help = 'To use, enter the sql command in a SQLLite format. '
                 + 'Several custom commands can also be used. Command parameters, where applicable, are separated by a space.';
