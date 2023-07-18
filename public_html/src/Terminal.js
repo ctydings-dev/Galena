@@ -491,16 +491,56 @@ class  Terminal {
         return ret;
     }
 
+    passwordMode = false;
+
+    isPasswordMode = function () {
+        return this.passwordMode === true;
+    }
+
+    setPasswordMode = function (toSet) {
+        this.passwordMode = toSet === true;
+
+    }
+
     getCursorInput = function (cursor) {
 
         var loc = this.getHorizontalOffset();
         if (loc === 0 || cursor.length < 1) {
             var ret = this.getInput() + cursor;
+
+            if (this.isPasswordMode() === true) {
+
+                ret = '';
+                while (ret.length < this.getInput().length) {
+                    ret = ret + '*';
+                }
+
+                ret = ret + cursor;
+            }
+
+
+
             return ret;
         }
         loc = this.getInputLength() - loc;
         var first = this.getInput().substring(0, loc);
         var second = this.getInput().substring(loc);
+        if (this.isPasswordMode() === true) {
+            var fp = '';
+            var sp = '';
+            while (fp.length < first.length) {
+                fp = fp + '*';
+            }
+
+            while (sp.length < second.length) {
+                sp = sp + '*';
+            }
+
+            first = fp;
+            second = sp;
+        }
+
+
         return first + cursor + second;
     }
 
@@ -509,6 +549,11 @@ class  Terminal {
         if (this.displayCursor() === true) {
             end = '_';
         }
+
+
+
+
+
 
         if (this.getFormattedInputLength() > this.getTextColCount()) {
 

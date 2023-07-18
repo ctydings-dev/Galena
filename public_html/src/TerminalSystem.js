@@ -49,6 +49,115 @@ var TerminalSystem = function (canvas, useVerbose) {
             throw err;
         }
     };
+
+    this.useClientValue = true;
+
+    this.hasServerModule = function () {
+        return false;
+    };
+
+    this.executeServerCmd = function (broken, orig) {
+        if (this.hasServerModule() !== true) {
+
+            this.printErrorText('This terminal does not have a server '
+                    + 'module attached!');
+            return;
+        }
+
+        if (broken[0] === 'SERVER') {
+
+
+
+            if (broken.length !== 2) {
+
+                if (this.getServerAddress() === null) {
+                    this.printErrorText('Server command must include one server address!');
+                    return;
+                }
+                orig[1] = this.getServerAddress();
+
+
+            }
+
+            this.setUseServer(orig[1]);
+            this.printVerbose('Sending commands to server: ' + orig[1]);
+
+            this.printText('Please Enter Password.');
+            this.getTerminal().setPasswordMode(true);
+            return;
+        }
+
+
+
+        if (broken[0] === 'SERVER_NAME') {
+            if (broken.length !== 2) {
+
+                this.printErrorText('Server name command must include one server address!');
+                return;
+
+
+
+            }
+
+            this.setServerAddress(orig[1]);
+            this.printVerbose('Server address set to: ' + orig[1]);
+
+
+
+            return;
+        }
+
+
+        if (broken[0] === 'PING') {
+
+
+            var pinger = new ServerPing(this, this.getServerAddress());
+
+            pinger.ping();
+
+
+            return;
+        }
+
+
+
+
+
+
+
+
+
+
+    };
+
+    this.useLocal = function () {
+
+        return this.useClientValue === true;
+    };
+
+    this.setUseLocal = function () {
+        this.useClientValue = true;
+    };
+
+    this.setUseServer = function (serverName) {
+        this.setServerAddress(serverName);
+        this.useClientValue = false;
+
+    };
+
+    this.serverAddress = null;
+
+    this.setServerAddress = function (toSet) {
+        this.serverAddres = toSet;
+    };
+
+    this.getServerAddress = function () {
+        return this.serverAddres;
+    }
+
+
+
+
     this.getMode = function () {
         return this.getModes()[this.getModeName()];
     };
@@ -148,6 +257,15 @@ var TerminalSystem = function (canvas, useVerbose) {
 
     this.processCmd = function () {
         var input = this.getTerminal().getInput();
+
+        if (this.getTerminal().isPasswordMode() === true) {
+
+            this.processPrivate(input);
+            return;
+        }
+
+
+
         input = input.trim();
         if (input.indexOf(this.getSystemKey()) === 0) {
 
@@ -278,8 +396,30 @@ var TerminalSystem = function (canvas, useVerbose) {
         document.body.removeChild(anchorTag);
     };
 
+    this.processPrivate = function (input)
+    {
+
+        this.secretText = input;
+        this.getTerminal().clearInput();
+        this.getTerminal().setPasswordMode(false);
+    };
+
+    this.getSecretText = function () {
+        if (this.secretText === null) {
+            return '';
+        }
+        return this.secretText;
+    };
+
+
 
     this.executeSystemCommand = function (input) {
+
+
+
+
+
+
         this.getTerminal().clearInput();
         if (input.length < 1) {
             this.printErrorText('No command was given!');
@@ -320,6 +460,46 @@ var TerminalSystem = function (canvas, useVerbose) {
         }
 
 
+        if (broken[0] === 'SERVER') {
+
+            this.executeServerCmd(broken, orig);
+
+
+            return;
+        }
+
+
+
+        if (broken[0] === 'SERVER_NAME') {
+            this.executeServerCmd(broken, orig);
+
+
+            return;
+        }
+
+
+        if (broken[0] === 'PING') {
+            this.executeServerCmd(broken, orig);
+
+
+
+            return;
+        }
+
+
+
+
+
+
+
+        if (broken[0] === 'LOCAL') {
+
+
+
+            this.setUseLocal();
+            this.printVerbose('Processing commands locally.');
+            return;
+        }
 
 
 
@@ -361,12 +541,30 @@ var TerminalSystem = function (canvas, useVerbose) {
 
         if (broken[0] === 'MODE')
         {
+
+
+
+
             if (broken.length > 1) {
                 //this.printText('The mode is : ' + this.getMode());
 
-
-
                 var mode = broken[1];
+                if (this.useLocal() === false) {
+
+                    this.printVerbose('Sending Mode Request \'' + mode + '\' to ' + this.getServerAddress() + '.');
+
+                    return;
+
+                }
+
+
+
+
+
+
+
+
+
                 try {
                     this.printVerbose('Setting mode to ' + mode + '.');
                     this.setMode(mode);
@@ -396,8 +594,25 @@ var TerminalSystem = function (canvas, useVerbose) {
 
 
             }
+            this.printText('Enviroment:');
 
+            var srvName = this.getServerAddress();
 
+            if (srvName === null) {
+                srvName = 'None Entered';
+
+            }
+
+            if (this.useLocal() === true) {
+
+                this.printAlertText('Local Mode <- CURRENT');
+                this.printText('Server: ' + srvName);
+            } else
+            {
+                this.printText('Local Mode');
+                this.printAlertText('Server: ' + srvName + ' <- CURRENT');
+
+            }
 
             return;
         }
