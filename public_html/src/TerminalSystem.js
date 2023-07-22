@@ -1,3 +1,5 @@
+/* global genUtils */
+
 var TerminalSystem = function (canvas, useVerbose) {
 
     this.terminal = new Terminal(canvas);
@@ -108,17 +110,16 @@ var TerminalSystem = function (canvas, useVerbose) {
         }
 
 
-        if (broken[0] === 'PING') {
+        if (genUtils.isNull(this.getServerModule()) === true) {
 
+            this.setupServerModule();
+        } else
+        {
+            this.getServerModule().executeServerCommand('!ECHO HELLO DOLLY');
 
-            var pinger = new ServerPing(this, this.getServerAddress());
-
-            pinger.ping();
-
-
-            return;
         }
 
+        this.getServerModule().executeSystemCommand(broken, orig);
 
 
 
@@ -129,6 +130,26 @@ var TerminalSystem = function (canvas, useVerbose) {
 
 
     };
+
+
+    this.setupServerModule = function () {
+
+        var toSet = new ServerControlModule(this, this.getServerAddress(), 'test_session');
+
+        this.setServerModule(toSet);
+
+    };
+
+
+    this.setServerModule = function (toSet) {
+        this.serverModule = toSet;
+    };
+
+    this.getServerModule = function () {
+        return this.serverModule;
+    };
+
+
 
     this.useLocal = function () {
 
@@ -476,6 +497,17 @@ var TerminalSystem = function (canvas, useVerbose) {
 
             return;
         }
+        if (broken[0] === 'SERVER_CONNECT') {
+            this.executeServerCmd(broken, orig);
+
+
+            return;
+        }
+
+
+
+
+
 
 
         if (broken[0] === 'PING') {
