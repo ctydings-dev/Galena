@@ -90,14 +90,9 @@ class EncryptionModule {
             rsaStandard: 'RSA-OAEP'
         });
 
-        var temp = 'HELLOD DOLLY';
 
 
-        temp = crypt.encrypt(this.getPublicRSAKey(), temp);
-        temp = crypt.decrypt(this.getPrivateRSAKey(), temp);
-
-
-        var decrypted = crypt.decrypt(priKey, message);
+        var decrypted = crypt.decrypt(priKey, message.payload);
         return decrypted.message;
 
 
@@ -123,11 +118,12 @@ class EncryptionModule {
     }
 
     generateAESKey = function () {
+        throw 'AES not yet implemented!';
         this.aesKey = 'TEST KEY';
     }
 
     getSessionId = function () {
-        return 'test_session';
+        return this.getController().getSession();
     }
 
     sendRSACommand = function (cmd) {
@@ -157,10 +153,19 @@ class EncryptionModule {
                 stop = true;
                 encrypted = JSON.parse(encrypted);
 
-                var decrypted = term.decryptRSA(encrypted.payload);
-                decrypted = JSON.parse(decrypted);
-                term.getController().processOutput(decrypted);
+                var decrypted = term.decryptRSA(encrypted);
 
+                decrypted = decrypted.substring(1, decrypted.length - 1);
+
+                decrypted = genUtils.replaceInString(decrypted, '\\"', '"');
+
+
+
+
+                var result = JSON.parse(decrypted);
+                for (var index = 0; index < result.length; result++) {
+                    term.getController().processOutput(result[index]);
+                }
 
 
 
@@ -170,14 +175,16 @@ class EncryptionModule {
     }
 
     sendRSAKey = function () {
-        this.printText('Sending client public RSA key to server.');
+        this.printText('Sending client public RSA key to server for session ' + this.getSessionId() + '.');
         var http = new XMLHttpRequest();
         var url = this.getServer() + '/rsa_tunnel_request';
         http.open('POST', url);
         http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
         var params = {};
+
         params.session = this.getSessionId();
-        params.session = this.getSessionId();
+        params.password = this.getController().getPassword();
+        this.getController().clearPassword();
         params.rsaKey = this.getPublicRSAKey();
         var comb = JSON.stringify(params);
         var payload = {};
@@ -206,11 +213,14 @@ class EncryptionModule {
     }
 
     packageRSACommand = function (command) {
+        var args = genUtils.breakupString(command, ' ');
         var data = {
 
             session: this.getSessionId(),
             type: 'COMMAND',
-            command: command
+            command: command,
+            args: args
+
 
         };
 

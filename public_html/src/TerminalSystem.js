@@ -133,10 +133,13 @@ var TerminalSystem = function (canvas, useVerbose) {
 
 
     this.setupServerModule = function () {
+        var time = Date.now();
 
-        var toSet = new ServerControlModule(this, this.getServerAddress(), 'test_session');
-
+        var sessionName = 'SESSION_' + time;
+        var toSet = new ServerControlModule(this, this.getServerAddress(), sessionName, this.secretText);
+        this.secretText = '';
         this.setServerModule(toSet);
+        this.addModule(toSet);
 
     };
 
@@ -174,7 +177,7 @@ var TerminalSystem = function (canvas, useVerbose) {
 
     this.getServerAddress = function () {
         return this.serverAddres;
-    }
+    };
 
 
 
@@ -423,6 +426,14 @@ var TerminalSystem = function (canvas, useVerbose) {
         this.secretText = input;
         this.getTerminal().clearInput();
         this.getTerminal().setPasswordMode(false);
+
+
+        if (this.hasServerModule() === true) {
+            this.setupServerModule();
+
+        }
+
+
     };
 
     this.getSecretText = function () {
