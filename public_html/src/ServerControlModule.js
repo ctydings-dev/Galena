@@ -33,6 +33,14 @@ class ServerControlModule extends BaseModule {
         this.getTerminal().printText(msg);
     }
 
+    getUser = function () {
+        return this.getTerminal().getServerUser();
+    }
+
+    getPassword = function () {
+        return this.getTerminal().getSecretText();
+    }
+
     getTerminal = function ()
     {
         return this.terminal;
@@ -86,7 +94,28 @@ class ServerControlModule extends BaseModule {
         }
         if (output.type === 'TEXT') {
 
-            this.printText(output.text);
+            this.printText(output.value);
+            return;
+        }
+
+        if (output.type === 'TEXT_LIST') {
+
+            var value = output.value;
+            for (var index = 0; index < value.length; index++) {
+
+                this.printText(value[index]);
+            }
+            return;
+        }
+
+
+
+
+
+
+        if (output.type === 'ERROR') {
+            this.printErrorText(output.value);
+
             return;
         }
 

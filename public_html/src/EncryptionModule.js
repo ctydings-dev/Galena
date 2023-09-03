@@ -12,6 +12,7 @@ class EncryptionModule {
         this.established = false;
         var rsa = new RSA();
         var caller = this;
+        this.counter = 0;
 
 
         rsa.generateKeyPair(function (keyPair) {
@@ -117,6 +118,10 @@ class EncryptionModule {
         this.getController().printText(out);
     }
 
+    printErrorText = function (out) {
+        this.getController().printErrorText(out);
+    }
+
     generateAESKey = function () {
         throw 'AES not yet implemented!';
         this.aesKey = 'TEST KEY';
@@ -138,11 +143,17 @@ class EncryptionModule {
         var s = new URLSearchParams(Object.entries(payload)).toString();
         var term = this;
         var stop = false;
+        var results = [];
         http.onreadystatechange = (e) => {
 
-            if (stop === true) {
-                return;
-            }
+
+
+
+
+
+
+
+
 
             if (e.target.status !== 200) {
                 term.printErrorText('RSA command could not be completed!');
@@ -154,17 +165,27 @@ class EncryptionModule {
                 encrypted = JSON.parse(encrypted);
 
                 var decrypted = term.decryptRSA(encrypted);
-
-                decrypted = decrypted.substring(1, decrypted.length - 1);
-
+                if (decrypted.indexOf('"') === 0) {
+                    decrypted = decrypted.substring(1, decrypted.length - 1);
+                }
                 decrypted = genUtils.replaceInString(decrypted, '\\"', '"');
 
 
 
 
                 var result = JSON.parse(decrypted);
-                for (var index = 0; index < result.length; result++) {
-                    term.getController().processOutput(result[index]);
+                var counter = result.counter;
+                if (results[counter] === true) {
+                    return;
+                }
+                results[counter] = true;
+
+                if (Array.isArray(result)) {
+                    for (var index = 0; index < result.length; result++) {
+                        term.getController().processOutput(result[index]);
+                    }
+                } else {
+                    term.getController().processOutput(result);
                 }
 
 
@@ -184,6 +205,7 @@ class EncryptionModule {
 
         params.session = this.getSessionId();
         params.password = this.getController().getPassword();
+        params.user = this.getController().getUser();
         this.getController().clearPassword();
         params.rsaKey = this.getPublicRSAKey();
         var comb = JSON.stringify(params);
@@ -212,12 +234,23 @@ class EncryptionModule {
 
     }
 
+    getCounter = function () {
+
+        this.counter++;
+
+        return this.counter;
+    }
+
     packageRSACommand = function (command) {
         var args = genUtils.breakupString(command, ' ');
+        var user = this.getController().getUser();
+        var password = this.getController().getPassword();
         var data = {
-
+            user: user,
+            password: password,
             session: this.getSessionId(),
             type: 'COMMAND',
+            counter: this.getCounter(),
             command: command,
             args: args
 

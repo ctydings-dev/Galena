@@ -8,6 +8,7 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.systemKey = '!';
     this.mode = null;
     this.modes = [];
+    this.serverUserName = 'GUEST';
     this.verbose = true;
     this.isVerbose = function () {
         return this.verbose === true;
@@ -58,6 +59,15 @@ var TerminalSystem = function (canvas, useVerbose) {
         return false;
     };
 
+    this.getServerUser = function () {
+        return this.serverUserName;
+    };
+
+    this.setServerUser = function (toSet) {
+        this.serverUserName = toSet;
+    };
+
+
     this.executeServerCmd = function (broken, orig) {
         if (this.hasServerModule() !== true) {
 
@@ -89,6 +99,19 @@ var TerminalSystem = function (canvas, useVerbose) {
             return;
         }
 
+        if (broken[0] === 'PASSWORD' || broken[0] === 'SERVER_PASSWORD') {
+
+            this.printText('Please Enter Password.');
+            this.getTerminal().setPasswordMode(true);
+
+
+
+            return;
+        }
+
+
+
+
 
 
         if (broken[0] === 'SERVER_NAME') {
@@ -108,6 +131,37 @@ var TerminalSystem = function (canvas, useVerbose) {
 
             return;
         }
+
+
+        if (broken[0] === 'SERVER_USER') {
+            if (broken.length !== 2) {
+
+                this.printErrorText('Server user command must include one server address!');
+                return;
+
+
+
+            }
+
+            this.setServerUser(orig[1]);
+            this.printVerbose('Server user set to: ' + orig[1]);
+
+
+
+            return;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         if (genUtils.isNull(this.getServerModule()) === true) {
@@ -137,7 +191,7 @@ var TerminalSystem = function (canvas, useVerbose) {
 
         var sessionName = 'SESSION_' + time;
         var toSet = new ServerControlModule(this, this.getServerAddress(), sessionName, this.secretText);
-        this.secretText = '';
+        //this.secretText = '';
         this.setServerModule(toSet);
         this.addModule(toSet);
 
@@ -508,6 +562,22 @@ var TerminalSystem = function (canvas, useVerbose) {
 
             return;
         }
+
+
+        if (broken[0] === 'SERVER_USER') {
+            this.executeServerCmd(broken, orig);
+            return;
+        }
+
+        if (broken[0] === 'PASSWORD' || broken[0] === 'SERVER_PASSWORD') {
+
+            this.executeServerCmd(broken, orig);
+            return;
+        }
+
+
+
+
         if (broken[0] === 'SERVER_CONNECT') {
             this.executeServerCmd(broken, orig);
 
@@ -646,7 +716,7 @@ var TerminalSystem = function (canvas, useVerbose) {
 
             }
 
-            if (this.useLocal() === true) {
+            if (this.useLocal() === true && this.getModeName() !== 'SERVER') {
 
                 this.printAlertText('Local Mode <- CURRENT');
                 this.printText('Server: ' + srvName);
