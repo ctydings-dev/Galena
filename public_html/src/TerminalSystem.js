@@ -315,8 +315,8 @@ var TerminalSystem = function (canvas, useVerbose) {
         }
 
     };
-    this.printText = function (toPrint) {
-        this.getTerminal().addTextOutput(toPrint);
+    this.printText = function (toPrint, options) {
+        this.getTerminal().addTextOutput(toPrint, options);
     };
 
     this.printErrorText = function (toPrint) {
@@ -427,7 +427,7 @@ var TerminalSystem = function (canvas, useVerbose) {
         var options = {
             ignorePrint: true
 
-        }
+        };
 
         for (var index = 0; index < toPrint.length; index++) {
             this.printText(toPrint[index] + '', options);
