@@ -168,25 +168,20 @@ class EncryptionModule {
                 if (decrypted.indexOf('"') === 0) {
                     decrypted = decrypted.substring(1, decrypted.length - 1);
                 }
-                decrypted = genUtils.replaceInString(decrypted, '\\"', '"');
-
-
 
 
                 var result = JSON.parse(decrypted);
+                decrypted = '';
+                encrypted = '';
                 var counter = result.counter;
+                result = result.payload;
                 if (results[counter] === true) {
                     return;
                 }
                 results[counter] = true;
 
-                if (Array.isArray(result)) {
-                    for (var index = 0; index < result.length; result++) {
-                        term.getController().processOutput(result[index]);
-                    }
-                } else {
-                    term.getController().processOutput(result);
-                }
+                term.getController().processOutput(result);
+
 
 
 

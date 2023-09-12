@@ -98,6 +98,28 @@ class ServerControlModule extends BaseModule {
             return;
         }
 
+        if (output.type === 'TABLE') {
+
+            var cols = output.cols;
+            var rows = output.rows;
+            if (Array.isArray(cols) !== true) {
+                cols = [cols];
+            }
+            var table = new TextTable(cols);
+
+            for (var row = 0; row < rows.length; row++) {
+                for (var col = 0; col < rows[row].length; col++) {
+                    var cell = rows[row][col];
+                    table.setCell(row, col, cell);
+
+                }
+            }
+            this.getTerminal().printTable(table);
+            return;
+        }
+
+
+
         if (output.type === 'TEXT_LIST') {
 
             var value = output.value;
