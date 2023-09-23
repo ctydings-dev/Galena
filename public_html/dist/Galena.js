@@ -1,10 +1,10 @@
 /**
- * Galena Terminal System(GTS) Distribution File
- * (c) 2023 Christopher Tydings
- * Dist Creation Timestamp : 2023-05-05_01-48-45
- * Caveat Emptor
- */
-const GALENA_COMPILATION_DATE = '2023-05-05_01-48-45';
+* Galena Terminal System(GTS) Distribution File
+* (C) 2023 Christopher Tydings
+* Dist Creation Timestamp : 2023-09-23_15-26-15
+* Caveat Emptor
+*/
+const GALENA_COMPILATION_DATE = '2023-09-23_15-26-15';
 const genUtils = {
     isNull: function (toTest) {
         if (toTest === false) {
@@ -645,15 +645,41 @@ class  Terminal {
         var ret = this.getInputPrefix().length + this.getInputLength() + 1;
         return ret;
     }
+    passwordMode = false;
+    isPasswordMode = function () {
+        return this.passwordMode === true;
+    }
+    setPasswordMode = function (toSet) {
+        this.passwordMode = toSet === true;
+    }
     getCursorInput = function (cursor) {
         var loc = this.getHorizontalOffset();
         if (loc === 0 || cursor.length < 1) {
             var ret = this.getInput() + cursor;
+            if (this.isPasswordMode() === true) {
+                ret = '';
+                while (ret.length < this.getInput().length) {
+                    ret = ret + '*';
+                }
+                ret = ret + cursor;
+            }
             return ret;
         }
         loc = this.getInputLength() - loc;
         var first = this.getInput().substring(0, loc);
         var second = this.getInput().substring(loc);
+        if (this.isPasswordMode() === true) {
+            var fp = '';
+            var sp = '';
+            while (fp.length < first.length) {
+                fp = fp + '*';
+            }
+            while (sp.length < second.length) {
+                sp = sp + '*';
+            }
+            first = fp;
+            second = sp;
+        }
         return first + cursor + second;
     }
     getFormattedInput = function () {
@@ -739,6 +765,7 @@ class  Terminal {
     }
 }
 
+/* global genUtils */
 var TerminalSystem = function (canvas, useVerbose) {
     this.terminal = new Terminal(canvas);
     this.verbose = useVerbose;
@@ -746,6 +773,7 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.systemKey = '!';
     this.mode = null;
     this.modes = [];
+    this.serverUserName = 'GUEST';
     this.verbose = true;
     this.isVerbose = function () {
         return this.verbose === true;
@@ -783,6 +811,98 @@ var TerminalSystem = function (canvas, useVerbose) {
         } catch (err) {
             throw err;
         }
+    };
+    this.useClientValue = true;
+    this.hasServerModule = function () {
+        return false;
+    };
+    this.getServerUser = function () {
+        return this.serverUserName;
+    };
+    this.setServerUser = function (toSet) {
+        this.serverUserName = toSet;
+    };
+    this.executeServerCmd = function (broken, orig) {
+        if (this.hasServerModule() !== true) {
+            this.printErrorText('This terminal does not have a server '
+                    + 'module attached!');
+            return;
+        }
+        if (broken[0] === 'SERVER') {
+            if (broken.length !== 2) {
+                if (this.getServerAddress() === null) {
+                    this.printErrorText('Server command must include one server address!');
+                    return;
+                }
+                orig[1] = this.getServerAddress();
+            }
+            this.setUseServer(orig[1]);
+            this.printVerbose('Sending commands to server: ' + orig[1]);
+            this.printText('Please Enter Password.');
+            this.getTerminal().setPasswordMode(true);
+            return;
+        }
+        if (broken[0] === 'PASSWORD' || broken[0] === 'SERVER_PASSWORD') {
+            this.printText('Please Enter Password.');
+            this.getTerminal().setPasswordMode(true);
+            return;
+        }
+        if (broken[0] === 'SERVER_NAME') {
+            if (broken.length !== 2) {
+                this.printErrorText('Server name command must include one server address!');
+                return;
+            }
+            this.setServerAddress(orig[1]);
+            this.printVerbose('Server address set to: ' + orig[1]);
+            return;
+        }
+        if (broken[0] === 'SERVER_USER') {
+            if (broken.length !== 2) {
+                this.printErrorText('Server user command must include one server address!');
+                return;
+            }
+            this.setServerUser(orig[1]);
+            this.printVerbose('Server user set to: ' + orig[1]);
+            return;
+        }
+        if (genUtils.isNull(this.getServerModule()) === true) {
+            this.setupServerModule();
+        } else
+        {
+            this.getServerModule().executeServerCommand('!ECHO HELLO DOLLY');
+        }
+        this.getServerModule().executeSystemCommand(broken, orig);
+    };
+    this.setupServerModule = function () {
+        var time = Date.now();
+        var sessionName = 'SESSION_' + time;
+        var toSet = new ServerControlModule(this, this.getServerAddress(), sessionName, this.secretText);
+        //this.secretText = '';
+        this.setServerModule(toSet);
+        this.addModule(toSet);
+    };
+    this.setServerModule = function (toSet) {
+        this.serverModule = toSet;
+    };
+    this.getServerModule = function () {
+        return this.serverModule;
+    };
+    this.useLocal = function () {
+        return this.useClientValue === true;
+    };
+    this.setUseLocal = function () {
+        this.useClientValue = true;
+    };
+    this.setUseServer = function (serverName) {
+        this.setServerAddress(serverName);
+        this.useClientValue = false;
+    };
+    this.serverAddress = null;
+    this.setServerAddress = function (toSet) {
+        this.serverAddres = toSet;
+    };
+    this.getServerAddress = function () {
+        return this.serverAddres;
     };
     this.getMode = function () {
         return this.getModes()[this.getModeName()];
@@ -847,8 +967,8 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.printText(toPrint);
         }
     };
-    this.printText = function (toPrint) {
-        this.getTerminal().addTextOutput(toPrint);
+    this.printText = function (toPrint, options) {
+        this.getTerminal().addTextOutput(toPrint, options);
     };
     this.printErrorText = function (toPrint) {
         this.getTerminal().addErrorTextOutput('' + toPrint);
@@ -858,6 +978,10 @@ var TerminalSystem = function (canvas, useVerbose) {
     };
     this.processCmd = function () {
         var input = this.getTerminal().getInput();
+        if (this.getTerminal().isPasswordMode() === true) {
+            this.processPrivate(input);
+            return;
+        }
         input = input.trim();
         if (input.indexOf(this.getSystemKey()) === 0) {
             this.executeSystemCommand(input);
@@ -919,7 +1043,7 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.printArray = function (toPrint) {
         var options = {
             ignorePrint: true
-        }
+        };
         for (var index = 0; index < toPrint.length; index++) {
             this.printText(toPrint[index] + '', options);
         }
@@ -950,6 +1074,21 @@ var TerminalSystem = function (canvas, useVerbose) {
         document.body.appendChild(anchorTag);
         anchorTag.click();
         document.body.removeChild(anchorTag);
+    };
+    this.processPrivate = function (input)
+    {
+        this.secretText = input;
+        this.getTerminal().clearInput();
+        this.getTerminal().setPasswordMode(false);
+        if (this.hasServerModule() === true) {
+            this.setupServerModule();
+        }
+    };
+    this.getSecretText = function () {
+        if (this.secretText === null) {
+            return '';
+        }
+        return this.secretText;
     };
     this.executeSystemCommand = function (input) {
         this.getTerminal().clearInput();
@@ -983,6 +1122,35 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.printVerbose('Output size set to ' + size + '.');
             return;
         }
+        if (broken[0] === 'SERVER') {
+            this.executeServerCmd(broken, orig);
+            return;
+        }
+        if (broken[0] === 'SERVER_NAME') {
+            this.executeServerCmd(broken, orig);
+            return;
+        }
+        if (broken[0] === 'SERVER_USER') {
+            this.executeServerCmd(broken, orig);
+            return;
+        }
+        if (broken[0] === 'PASSWORD' || broken[0] === 'SERVER_PASSWORD') {
+            this.executeServerCmd(broken, orig);
+            return;
+        }
+        if (broken[0] === 'SERVER_CONNECT') {
+            this.executeServerCmd(broken, orig);
+            return;
+        }
+        if (broken[0] === 'PING') {
+            this.executeServerCmd(broken, orig);
+            return;
+        }
+        if (broken[0] === 'LOCAL') {
+            this.setUseLocal();
+            this.printVerbose('Processing commands locally.');
+            return;
+        }
         if (broken[0] === 'HELP') {
             if (broken.length > 1) {
                 for (var index = 1; index < broken.length; index++) {
@@ -1005,6 +1173,10 @@ var TerminalSystem = function (canvas, useVerbose) {
             if (broken.length > 1) {
                 //this.printText('The mode is : ' + this.getMode());
                 var mode = broken[1];
+                if (this.useLocal() === false) {
+                    this.printVerbose('Sending Mode Request \'' + mode + '\' to ' + this.getServerAddress() + '.');
+                    return;
+                }
                 try {
                     this.printVerbose('Setting mode to ' + mode + '.');
                     this.setMode(mode);
@@ -1023,6 +1195,19 @@ var TerminalSystem = function (canvas, useVerbose) {
                 {
                     this.printText('   ' + mode);
                 }
+            }
+            this.printText('Enviroment:');
+            var srvName = this.getServerAddress();
+            if (srvName === null) {
+                srvName = 'None Entered';
+            }
+            if (this.useLocal() === true && this.getModeName() !== 'SERVER') {
+                this.printAlertText('Local Mode <- CURRENT');
+                this.printText('Server: ' + srvName);
+            } else
+            {
+                this.printText('Local Mode');
+                this.printAlertText('Server: ' + srvName + ' <- CURRENT');
             }
             return;
         }
@@ -1587,6 +1772,26 @@ class SQLModule extends BaseModule {
         } catch (err) {
             this.getCaller().printErrorText(err);
         }
+    }
+    getData = function (cmd) {
+        const stmt = this.getDatabase().prepare(cmd);
+        stmt.getAsObject(); // {col1:1, col2:111}
+        // Bind new values
+        stmt.bind();
+        var ret = []
+        var counter = 0;
+        while (stmt.step()) { //
+            const row = stmt.getAsObject();
+            var curr = [];
+            var index = 0;
+            for (var prop in row) {
+                var value = row[prop];
+                curr.push(value)
+                index++;
+            }
+            ret.push(curr);
+        }
+        return ret;
     }
     printHelp = function () {
         var help = 'To use, enter the sql command in a SQLLite format. '
@@ -2299,6 +2504,9 @@ class CommandParser {
         }
         if (name === 'SQL_TABLE') {
             ret = new CreateSQLTableCommand();
+        }
+        if (name === 'GRAPH') {
+            ret = new CreateGraphCommand();
         }
         if (genUtils.isNull(ret) === true) {
             throw name + ' is not a recognized command!';
