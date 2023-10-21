@@ -1,10 +1,10 @@
 /**
-* Galena Terminal System(GTS) Distribution File
-* (C) 2023 Christopher Tydings
-* Dist Creation Timestamp : 2023-09-23_15-26-15
-* Caveat Emptor
-*/
-const GALENA_COMPILATION_DATE = '2023-09-23_15-26-15';
+ * Galena Terminal System(GTS) Distribution File
+ * (C) 2023 Christopher Tydings
+ * Dist Creation Timestamp : 2023-10-20_18-25-51
+ * Caveat Emptor
+ */
+const GALENA_COMPILATION_DATE = '2023-10-20_18-25-51';
 const genUtils = {
     isNull: function (toTest) {
         if (toTest === false) {
@@ -1590,20 +1590,43 @@ var KeySet = function () {
 };
 
 class BaseModule {
+    /**
+     *
+     * @param {type} name The name of the module.
+     * @returns {BaseModule}
+     */
     constructor(name) {
         this.name = name;
         this.introText = '';
         this.activateText = '';
+        this.silentMode = true;
     }
+    /**
+     * Returns the name of the module.
+     * @returns {type} The name of the module.
+     */
     getName = function () {
         return this.name;
     }
-    execute = function () {
+    /**
+     * TO BE IMPLEMENTED!!!
+     * Executes the command in the module.
+     * @param {type} cmd The command to be executed.
+     */
+    execute = function (cmd) {
         throw  this.getName() + ' has not been initalized yet!';
     }
+    /**
+     * Returns if the module has intro text.
+     * @returns {Boolean} If the module has intro text.
+     */
     hasIntroText = function () {
         return this.getIntroText().length > 0;
     }
+    /**
+     * Returns the intro text for the module.
+     * @returns {String} The intro text.
+     */
     getIntroText = function () {
         return this.introText;
     }
@@ -1615,6 +1638,64 @@ class BaseModule {
     hasActivateText = function () {
         return this.getActivateText().length > 0;
     }
+    /**
+     * Returns if the module is in silent mode.
+     * @returns {Boolean} If the module is in slient mode.
+     */
+    isSilent = function () {
+        return this.silentMode === true;
+    }
+    /**
+     * Sets the silent mode for the module.
+     * @param {Boolean} toSet If the module is to be in silent mode.
+     */
+    setSilentMode = function (toSet) {
+        this.silentMode = toSet === true;
+    }
+    /**
+     * Prints out the text if the silent mode is off.
+     * @param {String} toPrint The text to print out.
+     */
+    printText = function (toPrint) {
+        if (this.isSilent() === true) {
+            return;
+        }
+        this.getCaller().printText(toPrint);
+    }
+    /**
+     * Prints out the alert text if the silent mode is off.
+     * @param {String} toPrint The alert text to print out.
+     */
+    printAlertText = function (toPrint) {
+        if (this.isSilent() === true) {
+            return;
+        }
+        this.getCaller().printAlertrText(toPrint);
+    }
+    /**
+     * Prints out the error text if the silent mode is off.
+     * @param {String} toPrint The error text to print out.
+     */
+    printErrorText = function (toPrint) {
+        if (this.isSilent() === true) {
+            return;
+        }
+        this.getCaller().printErrorText(toPrint);
+    }
+    /**
+     * Prints out the text table if the silent mode is off.
+     * @param {String} toPrint The text table to print out.
+     */
+    printTable = function (toPrint) {
+        if (this.isSilent() === true) {
+            return;
+        }
+        this.getCaller().printTable(toPrint);
+    }
+    /**
+     *
+     * Prints the text for the module.
+     */
     printHelp = function () {
         this.getCaller().printErrorText('No help for ' + this.getName()
                 + ' has been added.');
@@ -1696,31 +1777,34 @@ class SQLModule extends BaseModule {
     moduleCmd = function (input) {
         var cmd = input.trim();
         var toCheck = cmd.toUpperCase();
-        if (toCheck.indexOf('EXPORT_LOADER') === 0) {
+        if (toCheck.indexOf('EXPORT_LOADER') === 0 ||
+                toCheck.indexOf('EXPORT_FILE') === 0) {
             cmd = cmd.trim();
             var fileName = cmd.substring(13).trim();
             if (fileName.length < 1) {
-                this.getCaller().printErrorText('No file name given!');
+                this.printErrorText('No file name given!');
                 return;
             }
             this.exportDBToLocalFile(fileName);
-            this.getCaller().printAlertText('Database exported to ' + fileName + '.');
+            this.printAlertText('Database exported to '
+                    + fileName + '.');
             return true;
         }
         if (toCheck.indexOf('EXPORT') === 0) {
             cmd = cmd.trim();
             var fileName = cmd.substring(6).trim();
             if (fileName.length < 1) {
-                this.getCaller().printErrorText('No file name given!');
+                this.printErrorText('No file name given!');
                 return;
             }
             this.exportDBToLocal(fileName);
-            this.getCaller().printAlertText('Database exported to ' + fileName + '.');
+            this.printAlertText('Database exported to ' +
+                    fileName + '.');
             return true;
         }
         if (toCheck === 'RELOAD') {
             this.reloadDB();
-            this.getCaller().printAlertText('Database reloaded.');
+            this.printAlertText('Database reloaded.');
             return true;
         }
         return false;
@@ -1737,7 +1821,7 @@ class SQLModule extends BaseModule {
             this.reloadDB();
         }
         if (print === true) {
-            this.getCaller().printText(cmd);
+            this.printText(cmd);
         }
         try {
             const stmt = this.getDatabase().prepare(cmd);
@@ -1764,13 +1848,19 @@ class SQLModule extends BaseModule {
                 counter++;
             }
             if (genUtils.isNull(table) !== true) {
-                this.getCaller().printTable(table);
+                this.printTable(table);
+            }
+            if (index < 0) {
+                index = 0;
+            }
+            if (cmd.toUpperCase().trim().indexOf('SELECT') === 0) {
+                this.printText('Results: ' + counter);
             }
             if (print === true) {
-                this.getCaller().printText('');
+                this.printText('');
             }
         } catch (err) {
-            this.getCaller().printErrorText(err);
+            this.printErrorText(err);
         }
     }
     getData = function (cmd) {
@@ -1796,30 +1886,30 @@ class SQLModule extends BaseModule {
     printHelp = function () {
         var help = 'To use, enter the sql command in a SQLLite format. '
                 + 'Several custom commands can also be used. Command parameters, where applicable, are separated by a space.';
-        this.getCaller().printText(help);
-        this.getCaller().printText('');
-        this.getCaller().printText('Custom Commands:');
+        this.printText(help);
+        this.printText('');
+        this.printText('Custom Commands:');
         var cols = ['Name', 'Desc.'];
         var table = new TextTable(cols);
         table.setCell(0, 0, 'DOWNLOAD file_name');
         table.setCell(0, 1, 'Downloads the DB as a binary array.');
         table.setCell(1, 0, 'RELOAD');
         table.setCell(1, 1, 'Reloads the database. Typcially used for internal use.');
-        this.getCaller().printTable(table);
-        this.getCaller().printText('');
+        this.printTable(table);
+        this.printText('');
         help = 'Pragma can also be used for SQLLite system operations. ' +
                 'To use, type \' PRAGMA\' plus the command name/paramters.'
                 + ' Please set the parameters in parenthesis.';
-        this.getCaller().printText(help);
-        this.getCaller().printText('');
-        this.getCaller().printText('Pragma Commands:');
+        this.printText(help);
+        this.printText('');
+        this.printText('Pragma Commands:');
         cols = ['Name', 'Desc.'];
         table = new TextTable(cols);
         table.setCell(0, 0, 'TABLE_LIST');
         table.setCell(0, 1, 'Lists the tables.');
         table.setCell(1, 0, 'TABLE_INFO(table_name)');
         table.setCell(1, 1, 'Lists the columns in the table.');
-        this.getCaller().printTable(table);
+        this.printTable(table);
     }
 }
 
