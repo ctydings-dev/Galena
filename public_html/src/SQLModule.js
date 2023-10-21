@@ -10,18 +10,6 @@ class SQLModule extends BaseModule {
         this.createDatabase();
         this.cmdCounter = 0;
         this.cmdCounterThreshold = 150;
-        this.silentMode = false;
-
-
-    }
-
-    isSilent = function () {
-        return this.silentMode === true;
-    }
-
-    setSilentMode = function (toSet) {
-
-        this.silentMode = toSet === true;
 
     }
 
@@ -205,36 +193,6 @@ class SQLModule extends BaseModule {
 
 
         return false;
-    }
-
-    printText = function (toPrint) {
-
-        if (this.isSilent() === true) {
-            return;
-        }
-
-        this.getCaller().printText(toPrint);
-    }
-
-    printAlertText = function (toPrint) {
-        if (this.isSilent() === true) {
-            return;
-        }
-        this.getCaller().printAlertrText(toPrint);
-    }
-
-    printErrorText = function (toPrint) {
-        if (this.isSilent() === true) {
-            return;
-        }
-        this.getCaller().printErrorText(toPrint);
-    }
-
-    printTable = function (toPrint) {
-        if (this.isSilent() === true) {
-            return;
-        }
-        this.getCaller().printTable(toPrint);
     }
 
     execute = function (cmd) {
