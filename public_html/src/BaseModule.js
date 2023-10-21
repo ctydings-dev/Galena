@@ -60,16 +60,28 @@ class BaseModule {
         return this.getActivateText().length > 0;
     }
 
+    /**
+     * Returns if the module is in silent mode.
+     * @returns {Boolean} If the module is in slient mode.
+     */
     isSilent = function () {
         return this.silentMode === true;
     }
 
+    /**
+     * Sets the silent mode for the module.
+     * @param {Boolean} toSet If the module is to be in silent mode.
+     */
     setSilentMode = function (toSet) {
 
         this.silentMode = toSet === true;
 
     }
 
+    /**
+     * Prints out the text if the silent mode is off.
+     * @param {String} toPrint The text to print out.
+     */
     printText = function (toPrint) {
 
         if (this.isSilent() === true) {
@@ -79,6 +91,10 @@ class BaseModule {
         this.getCaller().printText(toPrint);
     }
 
+    /**
+     * Prints out the alert text if the silent mode is off.
+     * @param {String} toPrint The alert text to print out.
+     */
     printAlertText = function (toPrint) {
         if (this.isSilent() === true) {
             return;
@@ -86,6 +102,10 @@ class BaseModule {
         this.getCaller().printAlertrText(toPrint);
     }
 
+    /**
+     * Prints out the error text if the silent mode is off.
+     * @param {String} toPrint The error text to print out.
+     */
     printErrorText = function (toPrint) {
         if (this.isSilent() === true) {
             return;
@@ -93,6 +113,10 @@ class BaseModule {
         this.getCaller().printErrorText(toPrint);
     }
 
+    /**
+     * Prints out the text table if the silent mode is off.
+     * @param {String} toPrint The text table to print out.
+     */
     printTable = function (toPrint) {
         if (this.isSilent() === true) {
             return;
