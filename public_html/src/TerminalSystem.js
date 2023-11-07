@@ -8,6 +8,7 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.systemKey = '!';
     this.mode = null;
     this.modes = [];
+
     this.serverUserName = 'GUEST';
     this.verbose = true;
     this.isVerbose = function () {
@@ -262,7 +263,7 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.printErrorText(err + '');
 
             this.mode = orig;
-            this.printErrorText('Mode reset to ' + this.getModeName() + '!');
+            this.printErrorText('Mode reset to ' + this.getModeName().getName() + '!');
         }
 
     };
@@ -316,8 +317,50 @@ var TerminalSystem = function (canvas, useVerbose) {
 
     };
     this.printText = function (toPrint, options) {
-        this.getTerminal().addTextOutput(toPrint, options);
+        return this.getTerminal().addTextOutput(toPrint, options);
     };
+
+
+    this.printBusyText = function (toPrint, options) {
+        var ret = this.printText(toPrint, options);
+
+        var today = new Date();
+        ret.start = today.getSeconds();
+
+        ret.getValue = function (time) {
+
+            time = time.getSeconds();
+
+            var time = time - this.start;
+            var options = ['|', '/', '-', '\\', '|', '/', '-', '\\'];
+
+
+
+
+
+
+            return this.value + ' [' + options[time % 8] + ']';
+        };
+
+        ret.reset = function () {
+            ret.getValue = function () {
+                return this.value;
+            };
+        };
+
+
+        ret.finish = function () {
+
+            ret.getValue = function () {
+                return this.value;
+
+            };
+        };
+
+        return ret;
+    };
+
+
 
     this.printErrorText = function (toPrint) {
 
@@ -579,7 +622,9 @@ var TerminalSystem = function (canvas, useVerbose) {
 
 
         if (broken[0] === 'SERVER_CONNECT') {
-            this.executeServerCmd(broken, orig);
+
+
+            this.setupServerModule();
 
 
             return;

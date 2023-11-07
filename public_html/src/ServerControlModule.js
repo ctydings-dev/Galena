@@ -7,10 +7,20 @@ class ServerControlModule extends BaseModule {
         this.session = session;
         this.terminal = terminal;
         this.password = md5(password);
+        this.currentDB = '';
 
 
 
 
+    }
+
+    setCurrentDB = function (toSet) {
+        this.currentDB = toSet;
+
+    }
+
+    getCurrentDB = function () {
+        return this.currentDB;
     }
 
     getPassword = function () {
@@ -30,7 +40,13 @@ class ServerControlModule extends BaseModule {
     }
 
     printText = function (msg) {
-        this.getTerminal().printText(msg);
+        var ret = this.getTerminal().printText(msg);
+        return ret;
+
+    }
+
+    printBusyText = function (msg) {
+        return this.getTerminal().printBusyText(msg);
     }
 
     getUser = function () {
@@ -162,6 +178,22 @@ class ServerControlModule extends BaseModule {
 
 
         this.getEncryption().sendRSACommand(message);
+
+
+    }
+
+    printHelp = function () {
+
+        this.printText('');
+        this.printText('***SERVER COMMAND MODULE INSTRUCTIONS***');
+
+        this.printText('This module is used for communication to a server.');
+        this.printText('Several different commands are listed below.');
+        this.printText('');
+        this.printText('SQL COMMANDS');
+        this.printText('SQL_TABLE_LIST [db name]');
+        this.printText('SQL_TABLE_DUMP [db name] [table name OR *');
+        this.printText('SQL_CMD [db name] [sql command]');
 
 
     }

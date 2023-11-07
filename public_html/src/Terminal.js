@@ -1,4 +1,6 @@
 
+
+
 /* global genUtils */
 
 class  Terminal {
@@ -244,9 +246,9 @@ class  Terminal {
             getGrossHeight: function () {
                 return this.gross;
             },
-            draw: function (xPos, yPos, area, caller) {
+            draw: function (xPos, yPos, area, caller, time) {
                 area.setColor(caller.getPalette().getTextColor());
-                area.drawText(this.getValue(), xPos, yPos);
+                area.drawText(this.getValue(time), xPos, yPos);
             }
 
 
@@ -580,6 +582,7 @@ class  Terminal {
     verticalInputPadding = 2;
     paint = function () {
 
+        var time = new Date();
         var xPos = 8;
         var yPos = 0;
         this.getArea().clear();
@@ -619,7 +622,7 @@ class  Terminal {
                 if (len <= rem) {
                     rem -= len;
                     yPos = this.getRowPosition(counter) + this.getBorderPadding();
-                    this.getOutputAt(index).draw(xPos, yPos, this.getArea(), this);
+                    this.getOutputAt(index).draw(xPos, yPos, this.getArea(), this, time);
                 } else
                 {
                     break;

@@ -115,7 +115,11 @@ class EncryptionModule {
     }
 
     printText = function (out) {
-        this.getController().printText(out);
+        return  this.getController().printText(out);
+    }
+
+    printBusyText = function (out) {
+        return this.getController().printBusyText(out);
     }
 
     printErrorText = function (out) {
@@ -132,7 +136,7 @@ class EncryptionModule {
     }
 
     sendRSACommand = function (cmd) {
-        this.printText('Sending Command: ' + cmd);
+        var msg = this.printBusyText('Sending Command: ' + cmd);
         var http = new XMLHttpRequest();
         var url = this.getServer() + '/rsa_request';
         http.open('POST', url);
@@ -148,7 +152,9 @@ class EncryptionModule {
 
 
 
-
+            msg.getValue = function () {
+                return this.value;
+            };
 
 
 
@@ -191,7 +197,7 @@ class EncryptionModule {
     }
 
     sendRSAKey = function () {
-        this.printText('Sending client public RSA key to server for session ' + this.getSessionId() + '.');
+        var msg = this.printBusyText('Sending client public RSA key to server for session ' + this.getSessionId() + '.');
         var http = new XMLHttpRequest();
         var url = this.getServer() + '/rsa_tunnel_request';
         http.open('POST', url);
@@ -211,9 +217,14 @@ class EncryptionModule {
         var stop = false;
         http.onreadystatechange = (e) => {
 
+
             if (stop === true) {
                 return;
             }
+
+            msg.reset();
+
+
             if (e.target.status !== 200) {
                 term.printErrorText('RSA tunnel could not be established!');
             }
@@ -263,7 +274,7 @@ class EncryptionModule {
     requestRSAServerKey = function () {
 
 
-        this.printText('Requesting public key from ' + this.getServer() + '.');
+        var msg = this.printBusyText('Requesting public key from ' + this.getServer() + '.');
         var http = new XMLHttpRequest();
         var url = this.getServer() + '/?public_key_request=true';
         http.open('GET', url);
@@ -276,7 +287,7 @@ class EncryptionModule {
         http.onreadystatechange = (e) => {
 
             if (e.target.status !== 200) {
-
+                msg.reset();
                 caller.getController().printErrorText('RSA public key could not be obtained!');
 
             }
@@ -284,6 +295,7 @@ class EncryptionModule {
             if (stop === true) {
                 return;
             }
+            msg.reset();
             var out = e.target.response + '';
 
             if (out.length > 0) {

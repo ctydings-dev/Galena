@@ -10,7 +10,7 @@ class BaseModule {
         this.name = name;
         this.introText = '';
         this.activateText = '';
-        this.silentMode = true;
+        this.silentMode = false;
     }
     /**
      * Returns the name of the module.
@@ -88,7 +88,7 @@ class BaseModule {
             return;
         }
 
-        this.getCaller().printText(toPrint);
+        return    this.getCaller().printText(toPrint);
     }
 
     /**
@@ -99,7 +99,7 @@ class BaseModule {
         if (this.isSilent() === true) {
             return;
         }
-        this.getCaller().printAlertrText(toPrint);
+        return   this.getCaller().printAlertrText(toPrint);
     }
 
     /**
@@ -110,7 +110,7 @@ class BaseModule {
         if (this.isSilent() === true) {
             return;
         }
-        this.getCaller().printErrorText(toPrint);
+        return  this.getCaller().printErrorText(toPrint);
     }
 
     /**
