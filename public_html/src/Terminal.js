@@ -8,7 +8,7 @@ class  Terminal {
     constructor(canvas, skipSetup) {
         this.area = new TerminalArea(canvas);
         if (skipSetup !== true) {
-            this.setup();
+           this.setup();
         }
     }
     getArea = function () {
@@ -639,11 +639,26 @@ class  Terminal {
         this.getArea().drawText(this.getFormattedInput(), xPos, yPos);
     }
 
-    setup = function () {
+    start = function(){
         var caller = this;
-        setInterval(function () {
-            caller.paint();
-        }, 20);
+        this.processId = setInterval(function () {
+             caller.paint();
+         }, 20);
+
+
+    }
+
+getProcessId = function(){
+    return this.processId;
+}
+
+
+    stop = function(){
+        clearInterval(this.getProcessId())
+    }
+
+    setup = function () {
+        this.start();
         this.addSplash();
     }
 }

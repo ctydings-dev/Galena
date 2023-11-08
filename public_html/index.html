@@ -12,6 +12,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <script src="./src/TerminalArea.js"></script>
         <script src="./src/TerminalPalette.js"></script>
         <script src="./src/Terminal.js"></script>
+        <script src="./src/FreeTextTerminal.js"></script>
         <script src="./src/TerminalSystem.js"></script>
         <script src="./src/KeySet.js"></script>
         <script src="./src/BaseModule.js"></script>
@@ -283,6 +284,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             var canvas = document.getElementById('galenaCanvas');
 
             var term = new TerminalSystem(canvas);
+            term.setTerminal('FREETEXT');
             term.setServerAddress('http://localhost:9900');
             term.setServerUser('root');
             term.secretText = 'Per@grin1';

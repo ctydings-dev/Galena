@@ -2,7 +2,19 @@
 
 var TerminalSystem = function (canvas, useVerbose) {
 
-    this.terminal = new Terminal(canvas);
+    //this.terminal = new Terminal(canvas);
+    this.terminals = {};
+
+    this.terminals['STANDARD'] = new Terminal(canvas);
+    this.terminals['STANDARD'].stop();
+    this.terminals['FREETEXT'] = new FreeTextTerminal(canvas);
+
+    this.terminals['FREETEXT'].stop();
+    this.terminal = this.terminals['STANDARD'];
+
+
+
+
     this.verbose = useVerbose;
     this.keySet = new KeySet();
     this.systemKey = '!';
@@ -21,6 +33,19 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.getModes = function () {
         return this.modes;
     };
+
+    this.setTerminal = function(toSet){
+        this.terminal.stop();
+        toSet = toSet.trim().toUpperCase();
+        this.terminal = this.getTerminals()[toSet];
+        this.terminal.start();
+
+    }
+
+    this.getTerminals = function(){
+        return this.terminals;
+    }
+
     this.addModule = function (toAdd) {
 
         try {
