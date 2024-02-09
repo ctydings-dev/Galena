@@ -6,7 +6,7 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.terminals = {};
 
     this.terminals['STANDARD'] = new Terminal(canvas);
-    this.terminals['STANDARD'].stop();
+    //this.terminals['STANDARD'].stop();
     this.terminals['FREETEXT'] = new FreeTextTerminal(canvas);
 
     this.terminals['FREETEXT'].stop();
@@ -623,6 +623,33 @@ var TerminalSystem = function (canvas, useVerbose) {
         }
 
 
+        if (broken[0] === 'COPY') {
+
+            var out = '';
+            var output = this.getTerminal().getOutput();
+
+            for (var index = 0; index < output.length; index++) {
+                out = out + output[index].getValue() + '\n';
+            }
+            navigator.clipboard.writeText(out);
+            return;
+        }
+
+
+
+        if (broken[0] === 'PASTE') {
+
+         this.getClipboardContent();
+            return;
+        }
+
+
+
+
+
+
+
+
 
         if (broken[0] === 'SERVER_NAME') {
             this.executeServerCmd(broken, orig);
@@ -950,6 +977,20 @@ save function!');
 
 
     };
+
+    this.getClipboardContent = function(){
+
+let caller = this;
+
+        setTimeout(async () => {
+            const text = await navigator.clipboard.readText();
+          
+         caller.getTerminal().setInput(text);
+
+          }, 200);
+    }
+
+
 
 
     this.printSystemHelp = function () {
