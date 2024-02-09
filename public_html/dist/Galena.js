@@ -1,10 +1,10 @@
 /**
- * Galena Terminal System(GTS) Distribution File
- * (C) 2023 Christopher Tydings
- * Dist Creation Timestamp : 2023-10-20_18-25-51
- * Caveat Emptor
- */
-const GALENA_COMPILATION_DATE = '2023-10-20_18-25-51';
+* Galena Terminal System(GTS) Distribution File
+* (C) 2023-2024 Christopher Tydings
+* Dist Creation Timestamp : 2024-02-08_21-36-12
+* Caveat Emptor
+*/
+const GALENA_COMPILATION_DATE = '2024-02-08_21-36-12';
 const genUtils = {
     isNull: function (toTest) {
         if (toTest === false) {
@@ -476,9 +476,9 @@ class  Terminal {
             getGrossHeight: function () {
                 return this.gross;
             },
-            draw: function (xPos, yPos, area, caller) {
+            draw: function (xPos, yPos, area, caller, time) {
                 area.setColor(caller.getPalette().getTextColor());
-                area.drawText(this.getValue(), xPos, yPos);
+                area.drawText(this.getValue(time), xPos, yPos);
             }
         };
         this.addOutput(toAdd);
@@ -705,6 +705,7 @@ class  Terminal {
     }
     verticalInputPadding = 2;
     paint = function () {
+        var time = new Date();
         var xPos = 8;
         var yPos = 0;
         this.getArea().clear();
@@ -743,7 +744,7 @@ class  Terminal {
                 if (len <= rem) {
                     rem -= len;
                     yPos = this.getRowPosition(counter) + this.getBorderPadding();
-                    this.getOutputAt(index).draw(xPos, yPos, this.getArea(), this);
+                    this.getOutputAt(index).draw(xPos, yPos, this.getArea(), this, time);
                 } else
                 {
                     break;
@@ -926,7 +927,7 @@ var TerminalSystem = function (canvas, useVerbose) {
         } catch (err) {
             this.printErrorText(err + '');
             this.mode = orig;
-            this.printErrorText('Mode reset to ' + this.getModeName() + '!');
+            this.printErrorText('Mode reset to ' + this.getModeName().getName() + '!');
         }
     };
     this.getSystemKey = function () {
@@ -968,7 +969,29 @@ var TerminalSystem = function (canvas, useVerbose) {
         }
     };
     this.printText = function (toPrint, options) {
-        this.getTerminal().addTextOutput(toPrint, options);
+        return this.getTerminal().addTextOutput(toPrint, options);
+    };
+    this.printBusyText = function (toPrint, options) {
+        var ret = this.printText(toPrint, options);
+        var today = new Date();
+        ret.start = today.getSeconds();
+        ret.getValue = function (time) {
+            time = time.getSeconds();
+            var time = time - this.start;
+            var options = ['|', '/', '-', '\\', '|', '/', '-', '\\'];
+            return this.value + ' [' + options[time % 8] + ']';
+        };
+        ret.reset = function () {
+            ret.getValue = function () {
+                return this.value;
+            };
+        };
+        ret.finish = function () {
+            ret.getValue = function () {
+                return this.value;
+            };
+        };
+        return ret;
     };
     this.printErrorText = function (toPrint) {
         this.getTerminal().addErrorTextOutput('' + toPrint);
@@ -1139,7 +1162,7 @@ var TerminalSystem = function (canvas, useVerbose) {
             return;
         }
         if (broken[0] === 'SERVER_CONNECT') {
-            this.executeServerCmd(broken, orig);
+            this.setupServerModule();
             return;
         }
         if (broken[0] === 'PING') {
@@ -1599,7 +1622,7 @@ class BaseModule {
         this.name = name;
         this.introText = '';
         this.activateText = '';
-        this.silentMode = true;
+        this.silentMode = false;
     }
     /**
      * Returns the name of the module.
@@ -1660,7 +1683,7 @@ class BaseModule {
         if (this.isSilent() === true) {
             return;
         }
-        this.getCaller().printText(toPrint);
+        return    this.getCaller().printText(toPrint);
     }
     /**
      * Prints out the alert text if the silent mode is off.
@@ -1670,7 +1693,7 @@ class BaseModule {
         if (this.isSilent() === true) {
             return;
         }
-        this.getCaller().printAlertrText(toPrint);
+        return   this.getCaller().printAlertrText(toPrint);
     }
     /**
      * Prints out the error text if the silent mode is off.
@@ -1680,7 +1703,7 @@ class BaseModule {
         if (this.isSilent() === true) {
             return;
         }
-        this.getCaller().printErrorText(toPrint);
+        return  this.getCaller().printErrorText(toPrint);
     }
     /**
      * Prints out the text table if the silent mode is off.
