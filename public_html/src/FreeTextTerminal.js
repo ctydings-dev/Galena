@@ -11,6 +11,8 @@ class FreeTextTerminal {
 
         this.cursor = this.createCursor();
 
+        this.addErrorTextOutput('');
+
 
 
 
@@ -20,6 +22,11 @@ class FreeTextTerminal {
             this.setup();
         }
     }
+
+
+getOutputHeight = function(){
+return 18;
+}
 
     createCursor = function () {
         var cursor = {};
@@ -39,7 +46,9 @@ class FreeTextTerminal {
 
             var check = this.getCaller().getOutputText(this.getY());
             if (this.x > check.length) {
-                this.x = check.length;
+                this.increaseY();
+                this.x = 0;
+
             }
 
 
@@ -48,11 +57,24 @@ class FreeTextTerminal {
         cursor.decreaseX = function () {
             this.x--;
             if (this.x < 0) {
+
+                if(this.getY() > 0){
+                    this.decreaseY();
+                   this.x = this.getCaller().getOutputText(this.getY()).length;
+                    return;
+                }
+
                 this.x = 0;
             }
         }
         cursor.increaseY = function () {
             this.y++;
+
+            if(this.getX() > this.getCaller().getOutputLength(this.getY())){
+                this.x = this.getCaller().getOutputLength(this.getY());
+            }
+
+
         }
 
         cursor.getCursorRange = function () {
@@ -75,6 +97,11 @@ class FreeTextTerminal {
             if (this.y < 0) {
                 this.y = 0;
             }
+
+if(this.getX() > this.getCaller().getOutputLength(this.getY())){
+    this.x = this.getCaller().getOutputLength(this.getY());
+}
+
         }
         cursor.caller = this;
 
@@ -98,6 +125,10 @@ class FreeTextTerminal {
         return this.getOutput()[index];
     }
 
+    getOutputLength = function(index){
+        return this.getOutputText(index).length;
+    }
+
     getOutputText = function (index) {
         var ret = this.getOutputAt(index);
         if (genUtils.isNull(ret) === true) {
@@ -106,6 +137,30 @@ class FreeTextTerminal {
         return ret.getValue(new Date());
 
     }
+
+    addErrorTextOutput = function(toPrint){
+this.errorText ={
+emptry : false,
+time : new Date(),
+text : toPrint
+} 
+
+
+    }
+    
+getErrorText = function(){
+
+if(this.errorTexxt.empty === false)
+{
+    return this.errorText.text;
+}
+
+return '';
+
+}
+
+
+
 
     getCursor = function () {
         return this.cursor;
@@ -190,13 +245,22 @@ class FreeTextTerminal {
         this.getArea().setFont(this.getPalette().getFont());
         var out = this.getOutput();
         var start = 0;
+var test = this.getMaxOutput();
+        if(this.getMaxOutput() > this.getOutputHeight()){
+start = this.getMaxOutput() - this.getOutputHeight();
+
+        }
+
+     
+
+
         var cursorHit = false;
         for (var index = start; index <= this.getMaxOutput(); index++) {
             var toPrint = this.getOutput()[index];
             if (genUtils.isNull(toPrint) !== true) {
 
                 if (this.getCursor().isInRange(index) === false) {
-                    this.printLine(toPrint, time, index)
+                    this.printLine(toPrint, time, index- start)
                 }
 
 
@@ -214,10 +278,10 @@ var blank = {
         for (var index = range.start; index <= range.end; index++) {
             var toPrint = this.getOutput()[index];
             if (genUtils.isNull(toPrint) !== true) {
-                this.printCursorLine(toPrint, time, index);
+                this.printCursorLine(toPrint, time, index- start);
             }
             else {
-                this.printCursorLine(blank, time, index);
+                this.printCursorLine(blank, time, index- start);
             }
 
         }
