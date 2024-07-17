@@ -1,10 +1,10 @@
 /**
-* Galena Terminal System(GTS) Distribution File
-* (C) 2023-2024 Christopher Tydings
-* Dist Creation Timestamp : 2024-02-08_21-36-12
-* Caveat Emptor
-*/
-const GALENA_COMPILATION_DATE = '2024-02-08_21-36-12';
+ * Galena Terminal System(GTS) Distribution File
+ * (C) 2023-2024 Christopher Tydings
+ * Dist Creation Timestamp : 2024-07-16_22-22-05
+ * Caveat Emptor
+ */
+const GALENA_COMPILATION_DATE = '2024-07-16_22-22-05';
 const genUtils = {
     isNull: function (toTest) {
         if (toTest === false) {
@@ -757,18 +757,33 @@ class  Terminal {
         this.getArea().setColor(this.getPalette().getTextColor());
         this.getArea().drawText(this.getFormattedInput(), xPos, yPos);
     }
-    setup = function () {
+    start = function () {
         var caller = this;
-        setInterval(function () {
+        this.processId = setInterval(function () {
             caller.paint();
         }, 20);
+    }
+    getProcessId = function () {
+        return this.processId;
+    }
+    stop = function () {
+        clearInterval(this.getProcessId())
+    }
+    setup = function () {
+        this.start();
         this.addSplash();
     }
 }
 
 /* global genUtils */
 var TerminalSystem = function (canvas, useVerbose) {
-    this.terminal = new Terminal(canvas);
+    //this.terminal = new Terminal(canvas);
+    this.terminals = {};
+    this.terminals['STANDARD'] = new Terminal(canvas);
+    //this.terminals['STANDARD'].stop();
+    this.terminals['FREETEXT'] = new FreeTextTerminal(canvas);
+    this.terminals['FREETEXT'].stop();
+    this.terminal = this.terminals['STANDARD'];
     this.verbose = useVerbose;
     this.keySet = new KeySet();
     this.systemKey = '!';
@@ -785,6 +800,15 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.getModes = function () {
         return this.modes;
     };
+    this.setTerminal = function (toSet) {
+        this.terminal.stop();
+        toSet = toSet.trim().toUpperCase();
+        this.terminal = this.getTerminals()[toSet];
+        this.terminal.start();
+    }
+    this.getTerminals = function () {
+        return this.terminals;
+    }
     this.addModule = function (toAdd) {
         try {
             toAdd.caller = this;
@@ -1149,6 +1173,19 @@ var TerminalSystem = function (canvas, useVerbose) {
             this.executeServerCmd(broken, orig);
             return;
         }
+        if (broken[0] === 'COPY') {
+            var out = '';
+            var output = this.getTerminal().getOutput();
+            for (var index = 0; index < output.length; index++) {
+                out = out + output[index].getValue() + '\n';
+            }
+            navigator.clipboard.writeText(out);
+            return;
+        }
+        if (broken[0] === 'PASTE') {
+            this.getClipboardContent();
+            return;
+        }
         if (broken[0] === 'SERVER_NAME') {
             this.executeServerCmd(broken, orig);
             return;
@@ -1292,6 +1329,13 @@ save function!');
         this.printErrorText('Command ' + broken[0] +
                 ' is not a recognized command!');
     };
+    this.getClipboardContent = function () {
+        let caller = this;
+        setTimeout(async () => {
+            const text = await navigator.clipboard.readText();
+            caller.getTerminal().setInput(text);
+        }, 200);
+    }
     this.printSystemHelp = function () {
         this.printText('The Galean Terminal System is a text based system. To use, simply type in the desired command. The current output appears in the bottom of the screen. Colors are used to denote message types');
         this.printAlertText('This is an alert message.');
