@@ -99,7 +99,7 @@ class BaseModule {
         if (this.isSilent() === true) {
             return;
         }
-        return   this.getCaller().printAlertrText(toPrint);
+        return   this.getCaller().printAlertText(toPrint);
     }
 
     /**

@@ -1,16 +1,10 @@
-
-
-
-
 class SQLModule extends BaseModule {
-
     constructor(source) {
         super('SQL');
         this.source = source;
         this.createDatabase();
         this.cmdCounter = 0;
         this.cmdCounterThreshold = 150;
-
     }
 
     getCmdCounter = function () {
@@ -31,7 +25,6 @@ class SQLModule extends BaseModule {
 
     needReset = function () {
         return this.getCmdCounter() >= this.getCmdResetThreshold();
-
     }
 
     getSource = function () {
@@ -52,146 +45,81 @@ class SQLModule extends BaseModule {
 
     loadDatabase = function (data) {
         this.db = new this.source.Database(data);
-
-
-
     }
 
     reloadDB = function () {
-
         var data = this.exportDB();
         this.closeDatabase();
         this.loadDatabase(data);
         this.resetCmdCounter();
-
     }
 
     exportDB = function () {
-
-
         var data = this.getDatabase().export();
         return data;
-
     }
 
     formatDBData = function (data) {
-
         if (data.length < 1) {
             return '[]';
         }
-
         var ret = '[' + data[0];
         for (var index = 1; index < data.length; index++) {
             ret = ret + ',' + data[index];
-
         }
-
         ret = ret + ']';
-
-
-
         return ret;
     }
 
     exportDBToLocal = function (fileName) {
-
         var data = this.exportDB();
         data = [this.formatDBData(data)];
         this.getCaller().downloadToLocal(data, fileName);
-
     }
 
     exportDBToLocalFile = function (fileName) {
-
-
-
         var data = this.exportDB();
         data = 'var loadParsedData = function(db){\nvar data = '
                 + this.formatDBData(data);
-
         data = data + ';\n db.loadDatabase(data);}';
-
-
-
-
         data = [data];
         this.getCaller().downloadToLocal(data, fileName);
     }
 
     moduleCmd = function (input) {
-
         var cmd = input.trim();
         var toCheck = cmd.toUpperCase();
-
-
-
         if (toCheck.indexOf('EXPORT_LOADER') === 0 ||
                 toCheck.indexOf('EXPORT_FILE') === 0) {
-
             cmd = cmd.trim();
-
-
             var fileName = cmd.substring(13).trim();
             if (fileName.length < 1) {
-
                 this.printErrorText('No file name given!');
                 return;
-
             }
-
-
-
-
             this.exportDBToLocalFile(fileName);
             this.printAlertText('Database exported to '
                     + fileName + '.');
             return true;
         }
-
-
-
-
-
-
-
-
-
         if (toCheck.indexOf('EXPORT') === 0) {
-
             cmd = cmd.trim();
-
-
             var fileName = cmd.substring(6).trim();
             if (fileName.length < 1) {
-
                 this.printErrorText('No file name given!');
                 return;
-
             }
-
-
-
-
             this.exportDBToLocal(fileName);
             this.printAlertText('Database exported to ' +
                     fileName + '.');
             return true;
         }
 
-
         if (toCheck === 'RELOAD') {
-
             this.reloadDB();
             this.printAlertText('Database reloaded.');
-
             return true;
         }
-
-
-
-
-
-
         return false;
     }
 
@@ -201,8 +129,6 @@ class SQLModule extends BaseModule {
             print = true;
         }
 
-
-
         if (this.moduleCmd(cmd) === true) {
             return;
         }
@@ -211,24 +137,18 @@ class SQLModule extends BaseModule {
             this.reloadDB();
         }
 
-
-
         if (print === true) {
             this.printText(cmd);
         }
         try {
-
-
             const stmt = this.getDatabase().prepare(cmd);
             stmt.getAsObject(); // {col1:1, col2:111}
-
             // Bind new values
             stmt.bind();
 
             var table = null;
 
             var counter = 0;
-
 
             while (stmt.step()) { //
                 const row = stmt.getAsObject();
@@ -237,9 +157,7 @@ class SQLModule extends BaseModule {
                     var cols = [];
                     for (var prop in row) {
                         cols.push(prop + '');
-
                     }
-
                     table = new TextTable(cols);
                 }
 
@@ -247,12 +165,9 @@ class SQLModule extends BaseModule {
                 for (var prop in row) {
                     var value = row[prop];
                     table.setCell(counter, index, value);
-
                     index++;
                 }
-
                 counter++;
-
             }
             if (genUtils.isNull(table) !== true) {
                 this.printTable(table);
@@ -260,13 +175,9 @@ class SQLModule extends BaseModule {
             if (index < 0) {
                 index = 0;
             }
-
             if (cmd.toUpperCase().trim().indexOf('SELECT') === 0) {
                 this.printText('Results: ' + counter);
-
             }
-
-
             if (print === true) {
                 this.printText('');
             }
@@ -275,7 +186,6 @@ class SQLModule extends BaseModule {
             this.printErrorText(err);
 
         }
-
     }
 
     getData = function (cmd) {
@@ -285,10 +195,7 @@ class SQLModule extends BaseModule {
         // Bind new values
         stmt.bind();
 
-        var ret = []
-
-        var counter = 0;
-
+        var ret = [];
 
         while (stmt.step()) { //
             const row = stmt.getAsObject();
@@ -300,15 +207,9 @@ class SQLModule extends BaseModule {
 
                 index++;
             }
-
             ret.push(curr);
-
         }
-
-
         return ret;
-
-
     }
 
     printHelp = function () {
@@ -319,8 +220,8 @@ class SQLModule extends BaseModule {
         this.printText('Custom Commands:');
         var cols = ['Name', 'Desc.'];
         var table = new TextTable(cols);
-        table.setCell(0, 0, 'DOWNLOAD file_name');
-        table.setCell(0, 1, 'Downloads the DB as a binary array.');
+        table.setCell(0, 0, 'EXPORT (or) EXPORT_LOADER file_name');
+        table.setCell(0, 1, 'Downloads the DB as a binary array/loader .');
         table.setCell(1, 0, 'RELOAD');
         table.setCell(1, 1, 'Reloads the database. Typcially used for internal use.');
         this.printTable(table);
@@ -339,11 +240,5 @@ class SQLModule extends BaseModule {
         table.setCell(1, 0, 'TABLE_INFO(table_name)');
         table.setCell(1, 1, 'Lists the columns in the table.');
         this.printTable(table);
-
-
-
-
-
     }
-
 }
