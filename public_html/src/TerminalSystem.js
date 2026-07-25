@@ -34,7 +34,7 @@ var TerminalSystem = function (canvas, useVerbose) {
         return this.modes;
     };
 
-    this.setTerminal = function(toSet){
+    this.setTerminal = function (toSet) {
         this.terminal.stop();
         toSet = toSet.trim().toUpperCase();
         this.terminal = this.getTerminals()[toSet];
@@ -42,7 +42,7 @@ var TerminalSystem = function (canvas, useVerbose) {
 
     }
 
-    this.getTerminals = function(){
+    this.getTerminals = function () {
         return this.terminals;
     }
 
@@ -335,6 +335,11 @@ var TerminalSystem = function (canvas, useVerbose) {
         this.getKeySet().processUpEvent(event.keyCode);
         this.paint();
     };
+
+    this.processMouseEvent = function (event) {
+        this.getTerminal().processMouseEvent(event);
+    };
+
     this.printVerbose = function (toPrint) {
         if (this.isVerbose() === true) {
             this.printText(toPrint);
@@ -639,7 +644,7 @@ var TerminalSystem = function (canvas, useVerbose) {
 
         if (broken[0] === 'PASTE') {
 
-         this.getClipboardContent();
+            this.getClipboardContent();
             return;
         }
 
@@ -978,16 +983,16 @@ save function!');
 
     };
 
-    this.getClipboardContent = function(){
+    this.getClipboardContent = function () {
 
-let caller = this;
+        let caller = this;
 
         setTimeout(async () => {
             const text = await navigator.clipboard.readText();
-          
-         caller.getTerminal().setInput(text);
 
-          }, 200);
+            caller.getTerminal().setInput(text);
+
+        }, 200);
     }
 
 
@@ -1028,5 +1033,11 @@ let caller = this;
     window.addEventListener("keyup", function () {
         caller.processUpEvent(event);
     });
+    window.addEventListener("click", function () {
+        event.type = 'CLICK';
+        caller.processMouseEvent(event);
+    });
+
+
     this.paint();
 };

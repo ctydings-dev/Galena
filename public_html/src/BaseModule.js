@@ -16,7 +16,7 @@ class BaseModule {
      * Returns the name of the module.
      * @returns {type} The name of the module.
      */
-    getName = function () {
+    getName() {
         return this.name;
     }
 
@@ -25,7 +25,7 @@ class BaseModule {
      * Executes the command in the module.
      * @param {type} cmd The command to be executed.
      */
-    execute = function (cmd) {
+    execute(cmd) {
         throw  this.getName() + ' has not been initalized yet!';
     }
 
@@ -33,7 +33,7 @@ class BaseModule {
      * Returns if the module has intro text.
      * @returns {Boolean} If the module has intro text.
      */
-    hasIntroText = function () {
+    hasIntroText() {
         return this.getIntroText().length > 0;
     }
 
@@ -41,22 +41,22 @@ class BaseModule {
      * Returns the intro text for the module.
      * @returns {String} The intro text.
      */
-    getIntroText = function () {
+    getIntroText() {
 
         return this.introText;
 
     }
 
-    activate = function (caller) {
+    activate(caller) {
 
     }
 
-    getActivateText = function () {
+    getActivateText() {
 
         return this.activateText;
     }
 
-    hasActivateText = function () {
+    hasActivateText() {
         return this.getActivateText().length > 0;
     }
 
@@ -64,7 +64,7 @@ class BaseModule {
      * Returns if the module is in silent mode.
      * @returns {Boolean} If the module is in slient mode.
      */
-    isSilent = function () {
+    isSilent() {
         return this.silentMode === true;
     }
 
@@ -72,7 +72,7 @@ class BaseModule {
      * Sets the silent mode for the module.
      * @param {Boolean} toSet If the module is to be in silent mode.
      */
-    setSilentMode = function (toSet) {
+    setSilentMode(toSet) {
 
         this.silentMode = toSet === true;
 
@@ -82,7 +82,7 @@ class BaseModule {
      * Prints out the text if the silent mode is off.
      * @param {String} toPrint The text to print out.
      */
-    printText = function (toPrint) {
+    printText(toPrint) {
 
         if (this.isSilent() === true) {
             return;
@@ -95,7 +95,7 @@ class BaseModule {
      * Prints out the alert text if the silent mode is off.
      * @param {String} toPrint The alert text to print out.
      */
-    printAlertText = function (toPrint) {
+    printAlertText(toPrint) {
         if (this.isSilent() === true) {
             return;
         }
@@ -106,7 +106,7 @@ class BaseModule {
      * Prints out the error text if the silent mode is off.
      * @param {String} toPrint The error text to print out.
      */
-    printErrorText = function (toPrint) {
+    printErrorText(toPrint) {
         if (this.isSilent() === true) {
             return;
         }
@@ -117,7 +117,7 @@ class BaseModule {
      * Prints out the text table if the silent mode is off.
      * @param {String} toPrint The text table to print out.
      */
-    printTable = function (toPrint) {
+    printTable(toPrint) {
         if (this.isSilent() === true) {
             return;
         }
@@ -128,13 +128,10 @@ class BaseModule {
      *
      * Prints the text for the module.
      */
-    printHelp = function () {
+    printHelp() {
 
         this.getCaller().printErrorText('No help for ' + this.getName()
                 + ' has been added.');
-
-
     }
-
 }
 

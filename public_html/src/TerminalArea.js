@@ -7,7 +7,7 @@ class TerminalArea {
         // this.setup();
     }
 
-    setCanvas = function (toSet, width, height) {
+    setCanvas(toSet, width, height) {
         this.canvas = toSet;
         this.context = null;
         this.width = width;
@@ -16,10 +16,10 @@ class TerminalArea {
 
     }
 
-    getCanvas = function () {
+    getCanvas() {
         return this.canvas;
     }
-    getContext = function () {
+    getContext() {
         if (genUtils.isNull(this.context) === true) {
             this.context = this.getCanvas().getContext('2d');
         }
@@ -41,7 +41,7 @@ class TerminalArea {
         return this.height;
     }
 
-    getStyles = function () {
+    getStyles() {
 
         var ret = {
             fill: this.getContext().fillStyle,
@@ -52,24 +52,24 @@ class TerminalArea {
         return ret;
     }
 
-    setColor = function (toSet) {
+    setColor(toSet) {
         this.getContext().fillStyle = toSet;
         this.getContext().strokeStyle = toSet;
     }
 
-    setFont = function (toSet) {
+    setFont(toSet) {
 
         this.getContext().font = toSet;
     }
 
-    getTextMode = function () {
+    getTextMode() {
 
         return this.textMode;
     }
 
-    textMode = 3;
+    textMode = 3
 
-    drawText = function (text, x, y) {
+    drawText(text, x, y) {
 
 
         if (this.getTextMode() % 2 === 1) {
@@ -89,20 +89,20 @@ class TerminalArea {
 
     }
 
-    clear = function () {
+    clear() {
         this.getContext().clearRect(0, 0, this.getWidth(), this.getHeight());
     }
 
-    fillRect = function (x, y, w, h) {
+    fillRect(x, y, w, h) {
         this.getContext().fillRect(x, y, w, h);
     }
 
-    drawBackground = function () {
+    drawBackground() {
         this.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 //https://www.geeksforgeeks.org/how-to-sharpen-blurry-text-in-html5-canvas/
 
-    setup = function () {
+    setup() {
         var ctx = this.getCanvas().getContext('2d');
         window.devicePixelRatio = 1; //Blury Text
         window.devicePixelRatio = 2; //Clear Text
