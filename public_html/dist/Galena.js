@@ -1,10 +1,10 @@
 /**
-* Galena Terminal System(GTS) Distribution File
-* (C) 2023-2024 Christopher Tydings
-* Dist Creation Timestamp : 2026-07-15_03-41-19
-* Caveat Emptor
-*/
-const GALENA_COMPILATION_DATE = '2026-07-15_03-41-19';
+ * Galena Terminal System(GTS) Distribution File
+ * (C) 2023-2024 Christopher Tydings
+ * Dist Creation Timestamp : 2026-07-27_05-25-12
+ * Caveat Emptor
+ */
+const GALENA_COMPILATION_DATE = '2026-07-27_05-25-12';
 const genUtils = {
     isNull: function (toTest) {
         if (toTest === false) {
@@ -204,16 +204,16 @@ class TerminalArea {
         this.canvas = canvas;
         // this.setup();
     }
-    setCanvas = function (toSet, width, height) {
+    setCanvas(toSet, width, height) {
         this.canvas = toSet;
         this.context = null;
         this.width = width;
         this.height = height;
     }
-    getCanvas = function () {
+    getCanvas() {
         return this.canvas;
     }
-    getContext = function () {
+    getContext() {
         if (genUtils.isNull(this.context) === true) {
             this.context = this.getCanvas().getContext('2d');
         }
@@ -231,25 +231,25 @@ class TerminalArea {
         }
         return this.height;
     }
-    getStyles = function () {
+    getStyles() {
         var ret = {
             fill: this.getContext().fillStyle,
             stroke: this.getContext().strokeStyle
         };
         return ret;
     }
-    setColor = function (toSet) {
+    setColor(toSet) {
         this.getContext().fillStyle = toSet;
         this.getContext().strokeStyle = toSet;
     }
-    setFont = function (toSet) {
+    setFont(toSet) {
         this.getContext().font = toSet;
     }
-    getTextMode = function () {
+    getTextMode() {
         return this.textMode;
     }
-    textMode = 3;
-    drawText = function (text, x, y) {
+    textMode = 3
+    drawText(text, x, y) {
         if (this.getTextMode() % 2 === 1) {
             this.getContext().fillText(text, x, y);
         }
@@ -257,17 +257,17 @@ class TerminalArea {
             this.getContext().strokeText(text, x, y);
         }
     }
-    clear = function () {
+    clear() {
         this.getContext().clearRect(0, 0, this.getWidth(), this.getHeight());
     }
-    fillRect = function (x, y, w, h) {
+    fillRect(x, y, w, h) {
         this.getContext().fillRect(x, y, w, h);
     }
-    drawBackground = function () {
+    drawBackground() {
         this.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 //https://www.geeksforgeeks.org/how-to-sharpen-blurry-text-in-html5-canvas/
-    setup = function () {
+    setup() {
         var ctx = this.getCanvas().getContext('2d');
         window.devicePixelRatio = 1; //Blury Text
         window.devicePixelRatio = 2; //Clear Text
@@ -292,17 +292,17 @@ class  Terminal {
     constructor(canvas, skipSetup) {
         this.area = new TerminalArea(canvas);
         if (skipSetup !== true) {
-           this.setup();
+            this.setup();
         }
     }
     getArea = function () {
         return this.area;
     }
     oldInputs = []
-    getOldInputs = function () {
+    getOldInputs() {
         return this.oldInputs;
     }
-    addOldInput = function () {
+    addOldInput() {
         var toAdd = this.getInput().trim();
         if (toAdd.length < 1) {
             return;
@@ -313,10 +313,10 @@ class  Terminal {
         }
     }
     oldInputIndex = 0;
-    getOldInputIndex = function () {
+    getOldInputIndex() {
         return this.oldInputIndex;
     }
-    setOldInputIndex = function (toSet) {
+    setOldInputIndex(toSet) {
         if (toSet < 0) {
             this.oldInputIndex = 0;
             return;
@@ -327,13 +327,13 @@ class  Terminal {
         }
         this.oldInputIndex = toSet;
     }
-    incrementInputIndex = function () {
+    incrementInputIndex() {
         this.setOldInputIndex(this.getOldInputIndex() + 1);
     }
-    decrementInputIndex = function () {
+    decrementInputIndex() {
         this.setOldInputIndex(this.getOldInputIndex() - 1);
     }
-    setOldInput = function () {
+    setOldInput() {
         if (this.getOldInputIndex() < 0) {
             return;
         }
@@ -343,29 +343,29 @@ class  Terminal {
         this.setInput(this.getOldInputs()[ this.getOldInputs().length - 1 - this.getOldInputIndex()]);
     }
     palette = new TerminalPalette();
-    getPalette = function () {
+    getPalette() {
         return this.palette;
     }
     output = [];
-    getOutput = function () {
+    getOutput() {
         return this.output;
     }
     blinkTime = 1500;
     blinkGhost = 1000;
-    getBlinkTime = function () {
+    getBlinkTime() {
         return this.blinkTime;
     }
-    getBlinkGhost = function () {
+    getBlinkGhost() {
         return this.blinkGhost;
     }
     lastUpdated = 0;
-    getLastUpdated = function () {
+    getLastUpdated() {
         return this.lastUpdated;
     }
-    updateTime = function () {
+    updateTime() {
         this.lastUpdated = genUtils.getTime();
     }
-    displayCursor = function () {
+    displayCursor() {
         var test = genUtils.getTime();
         test = test - this.getLastUpdated();
         if (test <= this.getBlinkGhost())
@@ -376,14 +376,14 @@ class  Terminal {
         return test > this.getBlinkTime() / 2;
     }
     cursor = '_';
-    getCursor = function () {
+    getCursor() {
         return this.cursor;
     }
     outputLimit = 500;
-    getOutputLimit = function () {
+    getOutputLimit() {
         return this.outputLimit;
     }
-    setOutputLimit = function (toSet) {
+    setOutputLimit(toSet) {
         if (toSet < 1) {
             throw 'Output limit must be a positive number!';
         }
@@ -391,10 +391,10 @@ class  Terminal {
     }
     //  version = '0.0.1';
     date = '';
-    getVersion = function () {
+    getVersion() {
         return this.version;
     }
-    addSplash = function (clear) {
+    addSplash(clear) {
         if (clear === true) {
             this.clearOutput();
         }
@@ -411,7 +411,7 @@ class  Terminal {
     getOutputSize = function () {
         return this.getOutput().length;
     }
-    addColorTextOutput = function (text, source) {
+    addColorTextOutput(text, source) {
         while (text.length > this.getTextColCount()) {
             var sub = text.substring(0, this.getTextColCount());
             text = text.substring(this.getTextColCount());
@@ -430,7 +430,7 @@ class  Terminal {
         };
         this.paint();
     }
-    addErrorTextOutput = function (text) {
+    addErrorTextOutput(text) {
         var source = {
             caller: this,
             getColor: function () {
@@ -440,7 +440,7 @@ class  Terminal {
         this.addColorTextOutput(text, source);
         return;
     }
-    addAlertTextOutput = function (text) {
+    addAlertTextOutput(text) {
         var source = {
             caller: this,
             getColor: function () {
@@ -450,7 +450,7 @@ class  Terminal {
         this.addColorTextOutput(text, source);
         return;
     }
-    addTextOutput = function (text, options) {
+    addTextOutput(text, options) {
         if (genUtils.isNull(options) === true) {
             options = {};
         }
@@ -479,6 +479,9 @@ class  Terminal {
             draw: function (xPos, yPos, area, caller, time) {
                 area.setColor(caller.getPalette().getTextColor());
                 area.drawText(this.getValue(time), xPos, yPos);
+            },
+            contains: function (cursorX, cursorY, event) {
+                return false;
             }
         };
         this.addOutput(toAdd);
@@ -487,19 +490,19 @@ class  Terminal {
         }
         return toAdd;
     }
-    getOutputAt = function (index) {
+    getOutputAt(index) {
         return this.getOutput()[index];
     }
-    addOutput = function (toAdd) {
+    addOutput(toAdd) {
         this.getOutput().push(toAdd);
         while (this.getOutputSize() > this.getOutputLimit()) {
             this.getOutput().shift();
         }
     }
-    clearOutput = function () {
+    clearOutput() {
         this.output = [];
     }
-    calculateIdealHeight = function () {
+    calculateIdealHeight() {
         var ret = this.getVerticalInputPadding() * 2 * this.getPalette().getFontHeight();
         for (var index = 0; index < this.getOutput().length; index++)
         {
@@ -507,12 +510,12 @@ class  Terminal {
         }
         return ret;
     }
-    setCanvas = function (toSet, width, height) {
+    setCanvas(toSet, width, height) {
         this.getArea().setCanvas(toSet, width, height);
         this.textRowCount = null;
         this.textColCount = null;
     }
-    getPNG = function () {
+    getPNG() {
         var oldCanvas = this.getArea().getCanvas();
         var canvas = document.createElement('canvas');
         var idealHeight = this.calculateIdealHeight();
@@ -527,14 +530,14 @@ class  Terminal {
         this.setCanvas(oldCanvas);
         return ret;
     }
-    getTextRowCount = function () {
+    getTextRowCount() {
         if (genUtils.isNull(this.textRowCount) === true) {
             this.textRowCount = Math.floor((this.getArea().getHeight() - this.getPalette().getFontHeight() / 2) /
                     this.getPalette().getFontHeight());
         }
         return  this.textRowCount;
     }
-    getTextColCount = function () {
+    getTextColCount() {
         if (genUtils.isNull(this.textColCount) === true) {
             this.textColCount = Math.floor((this.getArea().getWidth() -
                     this.getColStartPosition()) /
@@ -543,10 +546,10 @@ class  Terminal {
         return this.textColCount;
     }
     horizontalOffset = 0;
-    getHorizontalOffset = function () {
+    getHorizontalOffset() {
         return this.horizontalOffset;
     }
-    setHorizontalOffset = function (toSet) {
+    setHorizontalOffset(toSet) {
         this.updateTime();
         if (genUtils.isInteger(toSet) !== true) {
             throw 'HORIZONTAL INCREMENT MUST BE A POSITIVE INTEGER';
@@ -559,17 +562,17 @@ class  Terminal {
         }
         this.horizontalOffset = toSet;
     }
-    incrementHorizontalOffset = function () {
+    incrementHorizontalOffset() {
         this.setHorizontalOffset(this.getHorizontalOffset() + 1);
     }
-    decrementHorizontalOffset = function () {
+    decrementHorizontalOffset() {
         this.setHorizontalOffset(this.getHorizontalOffset() - 1);
     }
     verticalOffset = 0;
-    getVerticalOffset = function () {
+    getVerticalOffset() {
         return this.verticalOffset;
     }
-    setVerticalOffset = function (toSet) {
+    setVerticalOffset(toSet) {
         if (toSet > this.getVerticalOffset()) {
             if (this.vertLock === true) {
                 return;
@@ -580,25 +583,25 @@ class  Terminal {
         }
         this.verticalOffset = toSet;
     }
-    incrementVerticalOffset = function () {
+    incrementVerticalOffset() {
         this.setVerticalOffset(this.getVerticalOffset() + 1);
     }
-    decrementVerticalOffset = function () {
+    decrementVerticalOffset() {
         this.setVerticalOffset(this.getVerticalOffset() - 1);
     }
     input = '';
-    getInput = function () {
+    getInput() {
         return this.input;
     }
-    setInput = function (toSet) {
+    setInput(toSet) {
         this.updateTime();
         this.input = toSet;
     }
-    clearInput = function () {
+    clearInput() {
         this.addOldInput();
         this.setInput('');
     }
-    appendInput = function (toAdd) {
+    appendInput(toAdd) {
         var loc = this.getHorizontalOffset();
         if (loc === 0) {
             this.setInput(this.getInput() + toAdd);
@@ -610,10 +613,10 @@ class  Terminal {
         var toSet = first + toAdd + second;
         this.setInput(toSet);
     }
-    getInputLength = function () {
+    getInputLength() {
         return this.getInput().length;
     }
-    trimInput = function () {
+    trimInput() {
         var len = this.getInputLength();
         if (len < 1) {
             return;
@@ -629,10 +632,10 @@ class  Terminal {
         var second = this.getInput().substring(len);
         this.setInput(first + second);
     }
-    getRowPosition = function (row) {
+    getRowPosition(row) {
         return  Math.floor(this.getPalette().getFontHeight() * row + this.getPalette().getFontHeight() / 2);
     }
-    getColStartPosition = function () {
+    getColStartPosition() {
         return this.colStartPosition;
     }
     colStartPosition = 5;
@@ -640,19 +643,19 @@ class  Terminal {
     getInputPrefix = function () {
         return this.inputPrefix;
     }
-    getFormattedInputLength = function ()
+    getFormattedInputLength()
     {
         var ret = this.getInputPrefix().length + this.getInputLength() + 1;
         return ret;
     }
     passwordMode = false;
-    isPasswordMode = function () {
+    isPasswordMode() {
         return this.passwordMode === true;
     }
-    setPasswordMode = function (toSet) {
+    setPasswordMode(toSet) {
         this.passwordMode = toSet === true;
     }
-    getCursorInput = function (cursor) {
+    getCursorInput(cursor) {
         var loc = this.getHorizontalOffset();
         if (loc === 0 || cursor.length < 1) {
             var ret = this.getInput() + cursor;
@@ -682,7 +685,7 @@ class  Terminal {
         }
         return first + cursor + second;
     }
-    getFormattedInput = function () {
+    getFormattedInput() {
         var end = '';
         if (this.displayCursor() === true) {
             end = '_';
@@ -703,10 +706,13 @@ class  Terminal {
     getBorderPadding = function () {
         return this.borderPadding;
     }
+    getXPadding = function () {
+        return 8;
+    }
     verticalInputPadding = 2;
     paint = function () {
         var time = new Date();
-        var xPos = 8;
+        var xPos = this.getXPadding();
         var yPos = 0;
         this.getArea().clear();
         this.getArea().setColor(this.getPalette().getBackgroundColor());
@@ -757,19 +763,84 @@ class  Terminal {
         this.getArea().setColor(this.getPalette().getTextColor());
         this.getArea().drawText(this.getFormattedInput(), xPos, yPos);
     }
-    start = function(){
+    strangeOffset = {
+        x: 11,
+        y: 11
+    };
+    getStrangeMouseOffsetX() {
+        return this.strangeOffset.x;
+    }
+    getStrangeMouseOffsetY() {
+        return this.strangeOffset.y;
+    }
+    processMouseEvent(event) {
+        var time = new Date();
+        var xCursor = event.x;
+        var yCursor = event.y;
+        var yPos = 0;
+        var xPos = this.getXPadding();
+        var xPad = this.getXPadding();
+        var repaint = false;
+        if (this.getOutputSize() > 0) {
+            this.vertLock = false;
+            var rem = this.getTextRowCount() - this.getVerticalInputPadding();
+            var total = rem;
+            var index = 0;
+            var offset = this.getVerticalOffset();
+            var index = this.getOutputSize() - 1 - offset;
+            var start = 0;
+            while (index >= 0) {
+                var len = this.getOutputAt(index).getHeight();
+                if (len <= rem) {
+                    rem -= len;
+                    start = index;
+                } else
+                {
+                    break;
+                }
+                index--;
+            }
+            index = start;
+            rem = total;
+            var counter = 0;
+            if (index === 0) {
+                this.vertLock = true;
+            }
+            while (index < this.getOutputSize())
+            {
+                var len = this.getOutputAt(index).getHeight();
+                if (len <= rem) {
+                    rem -= len;
+                    yPos = this.getRowPosition(counter) + this.getBorderPadding();
+                    var yLoc = yCursor - yPos - this.getStrangeMouseOffsetY();
+                    var xLoc = xCursor - xPos - this.getStrangeMouseOffsetX();
+                    if (this.getOutputAt(index).contains(xLoc, yLoc, event) === true)
+                    {
+                        this.getOutputAt(index).fireMouseEvent(xLoc, yLoc, event);
+                        repaint = true;
+                    }
+                }
+                counter += len;
+                index++;
+            }
+        }
+        if (repaint === true) {
+            this.paint();
+        }
+    }
+    start() {
         var caller = this;
         this.processId = setInterval(function () {
-             caller.paint();
-         }, 20);
+            caller.paint();
+        }, 20);
     }
-getProcessId = function(){
-    return this.processId;
-}
-    stop = function(){
-        clearInterval(this.getProcessId())
+    getProcessId() {
+        return this.processId;
     }
-    setup = function () {
+    stop() {
+        clearInterval(this.getProcessId());
+    }
+    setup() {
         this.start();
         this.addSplash();
     }
@@ -800,13 +871,13 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.getModes = function () {
         return this.modes;
     };
-    this.setTerminal = function(toSet){
+    this.setTerminal = function (toSet) {
         this.terminal.stop();
         toSet = toSet.trim().toUpperCase();
         this.terminal = this.getTerminals()[toSet];
         this.terminal.start();
     }
-    this.getTerminals = function(){
+    this.getTerminals = function () {
         return this.terminals;
     }
     this.addModule = function (toAdd) {
@@ -986,6 +1057,9 @@ var TerminalSystem = function (canvas, useVerbose) {
     this.processUpEvent = function (event) {
         this.getKeySet().processUpEvent(event.keyCode);
         this.paint();
+    };
+    this.processMouseEvent = function (event) {
+        this.getTerminal().processMouseEvent(event);
     };
     this.printVerbose = function (toPrint) {
         if (this.isVerbose() === true) {
@@ -1183,7 +1257,7 @@ var TerminalSystem = function (canvas, useVerbose) {
             return;
         }
         if (broken[0] === 'PASTE') {
-         this.getClipboardContent();
+            this.getClipboardContent();
             return;
         }
         if (broken[0] === 'SERVER_NAME') {
@@ -1329,12 +1403,12 @@ save function!');
         this.printErrorText('Command ' + broken[0] +
                 ' is not a recognized command!');
     };
-    this.getClipboardContent = function(){
-let caller = this;
+    this.getClipboardContent = function () {
+        let caller = this;
         setTimeout(async () => {
             const text = await navigator.clipboard.readText();
-         caller.getTerminal().setInput(text);
-          }, 200);
+            caller.getTerminal().setInput(text);
+        }, 200);
     }
     this.printSystemHelp = function () {
         this.printText('The Galean Terminal System is a text based system. To use, simply type in the desired command. The current output appears in the bottom of the screen. Colors are used to denote message types');
@@ -1359,6 +1433,10 @@ let caller = this;
     });
     window.addEventListener("keyup", function () {
         caller.processUpEvent(event);
+    });
+    window.addEventListener("click", function () {
+        event.type = 'CLICK';
+        caller.processMouseEvent(event);
     });
     this.paint();
 };
@@ -1672,7 +1750,7 @@ class BaseModule {
      * Returns the name of the module.
      * @returns {type} The name of the module.
      */
-    getName = function () {
+    getName() {
         return this.name;
     }
     /**
@@ -1680,50 +1758,50 @@ class BaseModule {
      * Executes the command in the module.
      * @param {type} cmd The command to be executed.
      */
-    execute = function (cmd) {
+    execute(cmd) {
         throw  this.getName() + ' has not been initalized yet!';
     }
     /**
      * Returns if the module has intro text.
      * @returns {Boolean} If the module has intro text.
      */
-    hasIntroText = function () {
+    hasIntroText() {
         return this.getIntroText().length > 0;
     }
     /**
      * Returns the intro text for the module.
      * @returns {String} The intro text.
      */
-    getIntroText = function () {
+    getIntroText() {
         return this.introText;
     }
-    activate = function (caller) {
+    activate(caller) {
     }
-    getActivateText = function () {
+    getActivateText() {
         return this.activateText;
     }
-    hasActivateText = function () {
+    hasActivateText() {
         return this.getActivateText().length > 0;
     }
     /**
      * Returns if the module is in silent mode.
      * @returns {Boolean} If the module is in slient mode.
      */
-    isSilent = function () {
+    isSilent() {
         return this.silentMode === true;
     }
     /**
      * Sets the silent mode for the module.
      * @param {Boolean} toSet If the module is to be in silent mode.
      */
-    setSilentMode = function (toSet) {
+    setSilentMode(toSet) {
         this.silentMode = toSet === true;
     }
     /**
      * Prints out the text if the silent mode is off.
      * @param {String} toPrint The text to print out.
      */
-    printText = function (toPrint) {
+    printText(toPrint) {
         if (this.isSilent() === true) {
             return;
         }
@@ -1733,7 +1811,7 @@ class BaseModule {
      * Prints out the alert text if the silent mode is off.
      * @param {String} toPrint The alert text to print out.
      */
-    printAlertText = function (toPrint) {
+    printAlertText(toPrint) {
         if (this.isSilent() === true) {
             return;
         }
@@ -1743,7 +1821,7 @@ class BaseModule {
      * Prints out the error text if the silent mode is off.
      * @param {String} toPrint The error text to print out.
      */
-    printErrorText = function (toPrint) {
+    printErrorText(toPrint) {
         if (this.isSilent() === true) {
             return;
         }
@@ -1753,7 +1831,7 @@ class BaseModule {
      * Prints out the text table if the silent mode is off.
      * @param {String} toPrint The text table to print out.
      */
-    printTable = function (toPrint) {
+    printTable(toPrint) {
         if (this.isSilent() === true) {
             return;
         }
@@ -1763,9 +1841,144 @@ class BaseModule {
      *
      * Prints the text for the module.
      */
-    printHelp = function () {
+    printHelp() {
         this.getCaller().printErrorText('No help for ' + this.getName()
                 + ' has been added.');
+    }
+}
+
+class GraphicalModule extends BaseModule {
+    constructor(name) {
+        super(name);
+    }
+    activate(caller) {
+    }
+    getDatabase() {
+        return this.db;
+    }
+    execute(cmd) {
+        var width = this.getWidth();
+        var height = this.getHeight();
+        var drawer = this.createDrawer();
+        this.createGraphObject(width, height, drawer);
+    }
+    getWidth() {
+        return this.getCaller().getTerminal().getArea().getWidth() - 20;
+    }
+    getHeight() {
+        throw 0;
+    }
+    createDrawer() {
+        var ret = {
+            caller: this,
+            getCaller: function () {
+                return this.caller;
+            },
+            contains: function (x, y, event) {
+                if (x < 0) {
+                    return false;
+                }
+                if (y < 0) {
+                    return false;
+                }
+                if (x > this.getCaller().getWidth()) {
+                    return false;
+                }
+                if (y > this.getCaller().getHeight()) {
+                    return false;
+                }
+                return true;
+            },
+            fireMouseEvent: function (x, y, event) {
+                return false;
+            }
+        };
+        return ret;
+    }
+    createGraphObject(width, height, drawer) {
+        var terminal = this.getCaller().getTerminal();
+        var gross = height;
+        height = gross / terminal.getPalette().getFontHeight() * 1;
+        height = Math.ceil(height) + 1;
+        var toAdd = {
+            height: height,
+            getValue: function () {
+                return 'GRAPH_OBJECT-' + this.getHeight() + 'ROWS_HIGHT';
+            },
+            gross: gross,
+            getHeight: function () {
+                return height;
+            },
+            getGrossHeight: function () {
+                return this.gross;
+            },
+            width: width,
+            getWidth: function () {
+                return this.width;
+            },
+            drawer: drawer,
+            getDrawer: function () {
+                return this.drawer;
+            },
+            createDrawHelper: function (context, xPos, yPos, width, height) {
+                var border = 2;
+                width -= border;
+                height -= border;
+                var ret = {
+                    xStart: xPos,
+                    yStart: yPos,
+                    ctx: context,
+                    width: width,
+                    height: height,
+                    border: 2,
+                    setFillStyle: function (color) {
+                        this.ctx.fillStyle = color;
+                    },
+                    setStrokeStyle: function (color) {
+                        this.ctx.strokeStyle = color;
+                    },
+                    fillRect: function (x, y, width, height) {
+                        this.ctx.fillRect(x + this.xStart + this.border, y + this.yStart + this.border, width, height);
+                    },
+                    convertPoint: function (x, y) {
+                        return {
+                            x: x + this.xStart,
+                            y: y + this.yStart
+                        };
+                    },
+                    drawBackground: function (background, border) {
+                        this.setFillStyle(border);
+                        this.fillRect(0, 0, this.width + this.border * 1, this.height + this.border * 1);
+                        this.setFillStyle(background);
+                        this.fillRect(this.border, this.border, this.width - this.border, this.height - this.border);
+                    },
+                    drawLine: function (xPoints, yPoints, color) {
+                        this.setStrokeStyle(color);
+                        this.ctx.beginPath();
+                        var point = this.convertPoint(xPoints[0], yPoints[0]);
+                        this.ctx.moveTo(point.x, point.y);
+                        for (var index = 0; index < xPoints.length; index++) {
+                            point = this.convertPoint(xPoints[index], yPoints[index]);
+                            this.ctx.lineTo(point.x, point.y);
+                        }
+                        this.ctx.stroke();
+                    }
+                };
+                return ret;
+            },
+            draw: function (xPos, yPos, area, caller, cursorPos) {
+                var ctx = area.getContext();
+                var helper = this.createDrawHelper(ctx, xPos, yPos, this.getWidth(), this.getGrossHeight());
+                this.getDrawer().draw(helper);
+            },
+            contains: function (x, y, event) {
+                return this.getDrawer().contains(x, y, event);
+            },
+            fireMouseEvent: function (x, y, event) {
+                this.getDrawer().fireMouseEvent(x, y, event);
+            }
+        };
+        this.getCaller().getTerminal().addOutput(toAdd);
     }
 }
 
@@ -2334,5 +2547,968 @@ class SQLTableBuilderModule extends BaseModule {
         }
         this.getSQL().execute(cmd);
     }
+}
+
+class SuperString {
+    constructor(value) {
+        this.value = value + '';
+        this.special = [];
+        this.calcStatus();
+    }
+    makeSpecial = function (index) {
+        if (genUtils.isNull(this.special[index]) === false) {
+            return;
+        }
+        this.special[index] = {
+            print: true,
+            ignore: false,
+            comment: false
+        };
+    }
+    ignore = function (index) {
+        this.getSpecial(index).ignore = true;
+    }
+    isSuperString = function () {
+        return true;
+    }
+    comment = function (index) {
+        this.getSpecial(index).comment = true;
+    }
+    noPrint = function (index) {
+        this.getSpecial(index).print = false;
+    }
+    getSpecial = function (index) {
+        if (genUtils.isNull(this.special[index]) === true) {
+            this.makeSpecial(index);
+        }
+        return this.special[index];
+    }
+    isIgnore = function (index) {
+        return this.getSpecial(index).ignore === true;
+    }
+    isComment = function (index) {
+        return  this.getSpecial(index).comment === true;
+    }
+    isNoPrint = function (index) {
+        return this.getSpecial(index).print === false;
+    }
+    isStringComment = function () {
+        var ret = false;
+        for (var index = 0; index < this.length(); index++) {
+            if (this.at(index) !== ' ') {
+                if (this.isIgnore(index) === false) {
+                    if (this.isComment(index) === true) {
+                        ret = true;
+                    } else
+                    {
+                        if (ret === true) {
+                            throw 'Comment mismatch!';
+                        }
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+    length = function () {
+        return this.getValue().length;
+    }
+    at = function (position) {
+        return this.getValue()[position];
+    }
+    contains = function (target) {
+        return this.indexOf(target) >= 0;
+    }
+    calcStatus = function () {
+        var cmt = null;
+        for (var index = 0; index < this.length(); index++)
+        {
+            if (this.isIgnore(index) === false)
+            {
+                var temp = this.at(index);
+                if (this.at(index) === '\\') {
+                    if (index + 1 < this.length()) {
+                        this.ignore(index + 1);
+                        this.noPrint(index);
+                    } else
+                    {
+                        throw 'Illegal Escape';
+                    }
+                }
+                if (genUtils.isNull(cmt) === true) {
+                    if (this.at(index) === "'" || this.at(index) === '"' || this.at(index) === "“") {
+                        this.comment(index);
+                        cmt = this.at(index);
+                        this.noPrint(index);
+                    }
+                } else
+                {
+                    this.comment(index);
+                    if (this.at(index) === cmt) {
+                        this.noPrint(index);
+                        cmt = null;
+                    }
+                }
+            }
+        }
+    }
+    print = function (start, end) {
+        if (genUtils.isNull(start) === true) {
+            start = 0;
+        }
+        if (genUtils.isNull(end) === true) {
+            end = this.length();
+        }
+        var ret = '';
+        for (var index = start; index < end; index++) {
+            var print = this.isNoPrint(index);
+            var toPrint = this.at(index);
+            if (print === false) {
+                ret += toPrint;
+            }
+        }
+        return ret;
+    }
+    isValid = function (index) {
+        if (this.isComment(index) === true) {
+            return false;
+        }
+        if (this.isIgnore(index) === true) {
+            return false;
+        }
+        return true;
+    }
+    createSub = function (start, end) {
+        var sub = this.getValue().substring(start, end);
+        sub = new SuperString(sub);
+        var counter = 0;
+        for (var index = start; index < end; index++) {
+            sub.special[counter] = this.getSpecial(index);
+            counter++;
+        }
+        return sub;
+    }
+    indexOf = function (target, start) {
+        if (genUtils.isNull(start) === true) {
+            start = 0;
+        }
+        for (var index = 0; index < this.length(); index++)
+        {
+            if (this.isComment(index) === false && this.isIgnore(index) === false) {
+                if (this.at(index) === target) {
+                    return index;
+                }
+            }
+        }
+        return -1;
+    }
+    getValue = function () {
+        return this.value;
+    }
+}
+
+class CommandValue {
+    constructor(value) {
+        if (typeof value === 'string') {
+            value = new SuperString(value);
+        }
+        this.value = value;
+    }
+    isTrue = function () {
+        return false;
+    }
+    getValue = function () {
+        return this.value;
+    }
+    getText = function () {
+        try {
+            return this.getValue().print();
+        } catch (err) {
+        }
+        return this.value + '';
+    }
+    isCommand = function () {
+        return false;
+    }
+    isArray = function () {
+        return false;
+    }
+    isQuote = function () {
+        return false;
+    }
+    addToTable = function (table, row, col) {
+        table.setCell(row, col, this.getText());
+    }
+}
+
+class CommandArray extends  CommandValue
+{
+    constructor() {
+        super([]);
+    }
+    isArray = function () {
+        return true;
+    }
+    length = function () {
+        return this.getValue().length;
+    }
+    at = function (index) {
+        index = Number(index);
+        if (index < 0 || index >= this.length()) {
+            throw 'Index ' + index + ' is out of bounds!';
+        }
+        return this.getValue()[index];
+    }
+    push = function (toAdd) {
+        if (genUtils.isNull(toAdd) === true) {
+            this.value.push(toAdd);
+            return;
+        }
+        if (genUtils.isNull(toAdd.value) === true) {
+            toAdd = new CommandValue(toAdd);
+        }
+        this.value.push(toAdd);
+    }
+}
+
+class CommandQuote extends  CommandValue
+{
+    constructor(value) {
+        super(value);
+    }
+    isQuote = function () {
+        return true;
+    }
+}
+
+class Command extends CommandArray {
+    constructor(name) {
+        super();
+        this.name = name;
+    }
+    addArg = function (toAdd) {
+        this.push(toAdd);
+    }
+    getArgs = function () {
+        return this.value;
+    }
+    length = function () {
+        return this.getArgs().length;
+    }
+    getArg = function (index) {
+        if (index < 0 || index >= this.length()) {
+            throw 'Out of bounds index!';
+        }
+        return this.getArgs()[index];
+    }
+    getName = function () {
+        return this.name;
+    }
+    at = function (index) {
+        return this.getArg(index);
+    }
+    isBoolean = function () {
+        return false;
+    }
+    getValue = function (caller) {
+        return this.execute(caller);
+    }
+    execute = function (caller) {
+        throw 'Not yet implemented!';
+    }
+}
+
+class CommandParser {
+    constructor() {
+    }
+    parse = function (value) {
+        value = new SuperString(value);
+        var start = value.indexOf('(');
+        if (start < 1) {
+            throw 'Is not a function';
+        }
+        var name = value.createSub(0, start).print();
+        var ret = new Command(name);
+        var rem = value.createSub(start, value.length());
+        var index = this.getFuncEnd(rem);
+        rem = rem.createSub(1, index);
+        index = this.getParamEnd(rem);
+        while (index > 0) {
+            var first = rem.createSub(0, index);
+            rem = rem.createSub(index + 1);
+            ret.addArg(this.parseParam(first));
+            index = this.getParamEnd(rem);
+        }
+        if (rem.length() > 0) {
+            ret.addArg(this.parseParam(rem));
+        }
+        return this.convertCommand(ret);
+    }
+    parseParam = function (input) {
+        if (this.isComment(input) === true)
+        {
+            return new CommandQuote(input.print());
+        }
+        if (input.contains('(') === true) {
+            return this.parse(input.getValue());
+        }
+        var ret = new CommandValue(input.print());
+        return ret;
+    }
+    convertCommand = function (toConvert) {
+        var ret = null;
+        var name = toConvert.getName();
+        name = name.trim().toUpperCase();
+        if (name === 'JSON') {
+            ret = new JSONValueCommand();
+        }
+        if (name === 'IF') {
+            ret = new IFCommand();
+        }
+        if (name === 'NULL') {
+            ret = new IsNullValueCommand();
+        }
+        if (name === 'TREE') {
+            ret = new JSONTreeCommand();
+        }
+        if (name === 'SQL_TABLE') {
+            ret = new CreateSQLTableCommand();
+        }
+        if (name === 'GRAPH') {
+            ret = new CreateGraphCommand();
+        }
+        if (genUtils.isNull(ret) === true) {
+            throw name + ' is not a recognized command!';
+        }
+        ret.value = toConvert.value;
+        return ret;
+    }
+    isComment = function (toTest) {
+        return toTest.isStringComment();
+    }
+    getParamEnd = function (input) {
+        var counter = 0;
+        for (var index = 0; index < input.length(); index++) {
+            if (input.isValid(index) === true) {
+                if (input.at(index) === '(') {
+                    counter++;
+                }
+                if (input.at(index) === ')') {
+                    counter--;
+                }
+                if (counter === 0) {
+                    if (input.at(index) === ',') {
+                        return index;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+    getFuncEnd = function (input) {
+        var counter = 0;
+        for (var index = 0; index < input.length(); index++) {
+            if (input.isValid(index) === true) {
+                if (input.at(index) === '(') {
+                    counter++;
+                }
+                if (input.at(index) === ')') {
+                    counter--;
+                }
+                if (counter === 0) {
+                    return index;
+                }
+            }
+        }
+        throw 'Parenthesis mismatch!';
+    }
+}
+
+class BooleanCommand extends Command {
+    constructor(name) {
+        super(name);
+    }
+    isTrue = function () {
+        return false;
+    }
+    isBoolean = function () {
+        return false;
+    }
+}
+
+class CompareCommand extends BooleanCommand {
+    constructor(name) {
+        super(name);
+    }
+    compare = function (valueA, valueB, caller) {
+        throw 'Unimplmented comparison command.';
+    }
+    isTrue = function (caller) {
+        if (this.length() < 2) {
+            throw 'Insufficent argument count exception!'
+        }
+        var base = this.at(0).getValue();
+        for (var index = 1; index < this.length(); index++) {
+            if (this.compare(base, this.at(index).getValue(), caller) === false) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+class IfCommand extends BooleanCommand {
+    constructor() {
+        super('IF');
+    }
+    isTrue = function (caller) {
+        if (this.at(0).getValue() === true) {
+            return true;
+        }
+        return false;
+    }
+    getSource = function () {
+        return this.source;
+    }
+    setSource = function (toSet) {
+        this.source = toSet;
+    }
+    execute = function (caller) {
+        if (this.length() < 1) {
+            throw 'No boolean condition in statement!';
+        }
+        var ret = [];
+        if (this.isTrue(caller) === false) {
+            return ret;
+        }
+        for (var index = 1; index < this.length(); index++) {
+            var child = this.getArg(index);
+            if (child.isQuote() === false &&
+                    child.isArray() === false) {
+                var sub = new JSONValueCommand();
+                sub.addArg(child.getValue());
+                ret.push(sub.getValue());
+            } else {
+                child.setSource(this.getSource());
+                ret.push(child.getValue(caller));
+            }
+        }
+    }
+}
+
+class EqualsCommand extends BooleanCommand {
+    constructor() {
+        super('EQ');
+    }
+    compare = function (valueA, valueB, caller) {
+        return valueA === valueB;
+    }
+}
+
+class GreaterThanCommand extends BooleanCommand {
+    constructor() {
+        super('LD');
+    }
+    compare = function (valueA, valueB, caller) {
+        return valueA > valueB;
+    }
+}
+
+class IsNotNullCommand extends BooleanCommand {
+    constructor() {
+        super('EXISTS');
+    }
+    isTrue = function (caller) {
+        if (this.length() < 1) {
+            throw 'Insufficent argument count exception!'
+        }
+        var base = this.at(0).getValue();
+        return genUtils.isNull(base) !== true;
+    }
+}
+
+class IsNullCommand extends BooleanCommand {
+    constructor() {
+        super('null');
+    }
+    isTrue = function (caller) {
+        if (this.length() < 1) {
+            throw 'Insufficent argument count exception!'
+        }
+        var base = this.at(0).getValue();
+        return genUtils.isNull(base) === true;
+    }
+}
+
+class JSONValueCommand extends Command {
+    constructor() {
+        super('JSON');
+        this.source = null;
+    }
+    parsePath = function (path) {
+        var ret = genUtils.breakupString(path, '.');
+        return ret;
+    }
+    setSource = function (toSet) {
+        this.source = toSet;
+    }
+    getSource = function () {
+        if (genUtils.isNull(this.source) === true) {
+            throw 'No source!';
+        }
+        return this.source;
+    }
+    getPath = function (path) {
+        var curr = this.getSource();
+        path = this.parsePath(path.getText());
+        for (var index = 0; index < path.length; index++) {
+            var child = path[index];
+            curr = curr[child];
+            if (genUtils.isNull(curr) === true) {
+                return null;
+            }
+        }
+        if (Array.isArray(curr) === true) {
+            var ret = new CommandArray();
+            for (var index = 0; index < curr.length; index++) {
+                ret.push(curr[index]);
+            }
+            return ret;
+        }
+        return new CommandValue(new SuperString(curr));
+    }
+    execute = function () {
+        var ret = new CommandArray();
+        if (this.length() === 1) {
+            return this.getPath(this.getArg(0));
+        }
+        for (var index = 0; index < this.length(); index++) {
+            ret.push(this.getPath(this.getArg(index)));
+        }
+        return ret;
+    }
+}
+
+class LessThanCommand extends BooleanCommand {
+    constructor() {
+        super('LD');
+    }
+    compare = function (valueA, valueB, caller) {
+        return valueA < valueB;
+    }
+}
+
+class JSONTreeCommand extends Command {
+    constructor() {
+        super('TREE');
+        this.source = null;
+    }
+    setSource = function (toSet) {
+        this.source = toSet;
+    }
+    getSource = function () {
+        if (genUtils.isNull(this.source) === true) {
+            throw 'No source!';
+        }
+        return this.source;
+    }
+    parseObj = function (input, caller, padding, limit) {
+        if (limit < 0) {
+            return;
+        }
+        for (var prop in input) {
+            caller.print(padding + prop);
+            var sub = input[prop];
+            if (sub !== (sub + '')) {
+                this.parseObj(sub, caller, padding + '  ', limit - 1);
+            }
+        }
+    }
+    execute = function (caller) {
+        if (this.length() === 1) {
+            if (this.getArg(0).getValue() < 1) {
+                return;
+            }
+        }
+        this.parseObj(this.getSource(), caller, ' ', 10);
+        this.addArg(new CommandValue(0));
+        return null;
+    }
+}
+
+class CreateSQLTableCommand extends Command {
+    constructor() {
+        super('SQL_TABLE');
+    }
+    getTableName = function () {
+        return this.getArg(0).getText().trim().toLowerCase();
+    }
+    clearTable = function (caller) {
+        var cmd = 'DROP TABLE IF EXISTS ' + this.getTableName() + ';';
+        caller.executeSQLCmd(cmd);
+    }
+    getFields = function () {
+        var ret = [];
+        var hasArray = -1;
+        for (var index = 1; index < this.length(); index += 1) {
+            var value = this.getArg(index);
+            value = value.getText();
+            value = genUtils.breakupString(value, ' ');
+            var name = value[0];
+            var type = value[1];
+            var isArray = (value[2] + '').trim().toUpperCase() === 'ARRAY';
+            var source = value[3];
+            if (genUtils.isNull(source) === true) {
+                source = name;
+            }
+            if (isArray === true) {
+                if (hasArray >= 0) {
+                    throw 'Only one array table permitted!';
+                }
+                hasArray = ret.length;
+            }
+            if (this.isValidType(type) !== true) {
+                throw type + ' is not a valid type!';
+            }
+            var toAdd = {
+                name: name,
+                type: type,
+                isArray: isArray,
+                source: source
+            };
+            ret.push(toAdd);
+        }
+        if (hasArray >= 0) {
+            var array = ret[hasArray];
+            var sub = [];
+            for (var index = 0; index < ret.length; index++) {
+                if (index !== hasArray) {
+                    sub.push(ret[index]);
+                }
+            }
+            sub.push(array);
+            ret = sub;
+        }
+        return ret;
+    }
+    isValidType = function (type) {
+        type = type.trim().toUpperCase();
+        if (type === 'INTEGER') {
+            return true;
+        }
+        if (type.indexOf('VARCHAR') === 0) {
+            return true;
+        }
+        if (type === 'FLOAT') {
+            return true;
+        }
+        if (type === 'INTEGER') {
+            return true;
+        }
+        if (type === 'BOOL') {
+            return true;
+        }
+        return false;
+    }
+    ignoreErrors = function () {
+        return false;
+    }
+    createInsert = function (caller, fields, source, index) {
+        var cmd = '';
+        try {
+            var isArray = fields[fields.length - 1].isArray === true;
+            if (isArray === true) {
+                if (genUtils.isNull(index) === true) {
+                    index = this.getArrayLength(fields[fields.length - 1].source, source) - 1;
+                    this.createInsert(caller, fields, source, index);
+                    return;
+                }
+                if (index > 0) {
+                    this.createInsert(caller, fields, source, index - 1);
+                }
+            }
+            var end = fields.length;
+            if (isArray === true) {
+                end--;
+            }
+            var values = '';
+            var valueFields = '';
+            for (var sub = 0; sub < end; sub++) {
+                valueFields = valueFields + fields[sub].name + ',';
+                values = values + this.getValue(fields[sub], source) + ',';
+            }
+            if (isArray === true) {
+                valueFields = valueFields + fields[fields.length - 1].name;
+                var value = this.getValue(fields[fields.length - 1], source, index);
+                values = values + value;
+            } else
+            {
+                valueFields = valueFields.substring(0, valueFields.length - 1);
+                values = values.substring(0, values.length - 1);
+            }
+            cmd = 'INSERT INTO ' + this.getTableName() + ' (' + valueFields;
+            cmd = cmd + ') VALUES (' + values + ');';
+            caller.executeSQLCmd(cmd);
+            //
+//  alert(cmd);
+            //    return cmd;
+        } catch (err) {
+            if (this.ignoreErrors() === false) {
+                throw err;
+            }
+        }
+    }
+    getArrayLength = function (name, source) {
+        var cmd = new JSONValueCommand();
+        cmd.addArg(new CommandValue(name));
+        cmd.setSource(source);
+        var value = cmd.execute();
+        return value.length();
+    }
+    parsePath = function (path) {
+        var ret = genUtils.breakupString(path, '.');
+        return ret;
+    }
+    getPath = function (path, curr) {
+        for (var index = 0; index < path.length; index++) {
+            var child = path[index];
+            curr = curr[child];
+            if (genUtils.isNull(curr) === true) {
+                return null;
+            }
+        }
+        return curr;
+    }
+    getValue = function (field, source, index) {
+        var path = this.parsePath(field.source);
+        var value = this.getPath(path, source);
+        if (genUtils.isNull(value) === true) {
+            throw field.source + ' is not a valid field!';
+        }
+        if (index >= 0) {
+            value = value[index];
+        }
+        if (field.type.trim().toUpperCase() === 'BLOB' || field.type.trim().toUpperCase().indexOf('VARCHAR') >= 0) {
+            value = genUtils.replaceInString(value, "'", "''");
+            value = "'" + value + "'";
+        }
+        return value;
+    }
+    createTable = function (caller, fields) {
+        var name = this.getTableName();
+        var cmd = 'CREATE TABLE ' + name + '(id INTEGER PRIMARY KEY';
+        for (var index = 0; index < fields.length; index++) {
+            cmd = cmd + ', ' + fields[index].name + ' ' + fields[index].type;
+        }
+        cmd = cmd + ');';
+        caller.executeSQLCmd(cmd);
+    }
+    getSource = function () {
+        return this.source;
+    }
+    setSource = function (toSet) {
+        this.source = toSet;
+    }
+    execute = function (caller) {
+        if (this.length() < 2) {
+            throw 'Invalid number of arguments!';
+        }
+        var fields = this.getFields();
+        this.clearTable(caller);
+        this.createTable(caller, fields);
+        for (var index = 0; index < this.getSource().length; index++) {
+            var entry = this.getSource()[index];
+            this.createInsert(caller, fields, entry);
+        }
+    }
+}
+
+/*	This work is licensed under Creative Commons GNU LGPL License.
+ License: http://creativecommons.org/licenses/LGPL/2.1/
+ Version: 0.9
+ Author:  Stefan Goessner/2006
+ Web:     http://goessner.net/
+ */
+function xml2json(xml, tab) {
+    var X = {
+        toObj: function (xml) {
+            var o = {};
+            if (xml.nodeType == 1) {   // element node ..
+                if (xml.attributes.length)   // element with attributes  ..
+                    for (var i = 0; i < xml.attributes.length; i++)
+                        o["@" + xml.attributes[i].nodeName] = (xml.attributes[i].nodeValue || "").toString();
+                if (xml.firstChild) { // element has child nodes ..
+                    var textChild = 0, cdataChild = 0, hasElementChild = false;
+                    for (var n = xml.firstChild; n; n = n.nextSibling) {
+                        if (n.nodeType == 1)
+                            hasElementChild = true;
+                        else if (n.nodeType == 3 && n.nodeValue.match(/[^ \f\n\r\t\v]/))
+                            textChild++; // non-whitespace text
+                        else if (n.nodeType == 4)
+                            cdataChild++; // cdata section node
+                    }
+                    if (hasElementChild) {
+                        if (textChild < 2 && cdataChild < 2) { // structured element with evtl. a single text or/and cdata node ..
+                            X.removeWhite(xml);
+                            for (var n = xml.firstChild; n; n = n.nextSibling) {
+                                if (n.nodeType == 3)  // text node
+                                    o["#text"] = X.escape(n.nodeValue);
+                                else if (n.nodeType == 4)  // cdata node
+                                    o["#cdata"] = X.escape(n.nodeValue);
+                                else if (o[n.nodeName]) {  // multiple occurence of element ..
+                                    if (o[n.nodeName] instanceof Array)
+                                        o[n.nodeName][o[n.nodeName].length] = X.toObj(n);
+                                    else
+                                        o[n.nodeName] = [o[n.nodeName], X.toObj(n)];
+                                } else  // first occurence of element..
+                                    o[n.nodeName] = X.toObj(n);
+                            }
+                        } else { // mixed content
+                            if (!xml.attributes.length)
+                                o = X.escape(X.innerXml(xml));
+                            else
+                                o["#text"] = X.escape(X.innerXml(xml));
+                        }
+                    } else if (textChild) { // pure text
+                        if (!xml.attributes.length)
+                            o = X.escape(X.innerXml(xml));
+                        else
+                            o["#text"] = X.escape(X.innerXml(xml));
+                    } else if (cdataChild) { // cdata
+                        if (cdataChild > 1)
+                            o = X.escape(X.innerXml(xml));
+                        else
+                            for (var n = xml.firstChild; n; n = n.nextSibling)
+                                o["#cdata"] = X.escape(n.nodeValue);
+                    }
+                }
+                if (!xml.attributes.length && !xml.firstChild)
+                    o = null;
+            } else if (xml.nodeType == 9) { // document.node
+                o = X.toObj(xml.documentElement);
+            } else
+                alert("unhandled node type: " + xml.nodeType);
+            return o;
+        },
+        toJson: function (o, name, ind) {
+            var json = name ? ("\"" + name + "\"") : "";
+            if (o instanceof Array) {
+                for (var i = 0, n = o.length; i < n; i++)
+                    o[i] = X.toJson(o[i], "", ind + "\t");
+                json += (name ? ":[" : "[") + (o.length > 1 ? ("\n" + ind + "\t" + o.join(",\n" + ind + "\t") + "\n" + ind) : o.join("")) + "]";
+            } else if (o == null)
+                json += (name && ":") + "null";
+            else if (typeof (o) == "object") {
+                var arr = [];
+                for (var m in o)
+                    arr[arr.length] = X.toJson(o[m], m, ind + "\t");
+                json += (name ? ":{" : "{") + (arr.length > 1 ? ("\n" + ind + "\t" + arr.join(",\n" + ind + "\t") + "\n" + ind) : arr.join("")) + "}";
+            } else if (typeof (o) == "string")
+                json += (name && ":") + "\"" + o.toString() + "\"";
+            else
+                json += (name && ":") + o.toString();
+            return json;
+        },
+        innerXml: function (node) {
+            var s = ""
+            if ("innerHTML" in node)
+                s = node.innerHTML;
+            else {
+                var asXml = function (n) {
+                    var s = "";
+                    if (n.nodeType == 1) {
+                        s += "<" + n.nodeName;
+                        for (var i = 0; i < n.attributes.length; i++)
+                            s += " " + n.attributes[i].nodeName + "=\"" + (n.attributes[i].nodeValue || "").toString() + "\"";
+                        if (n.firstChild) {
+                            s += ">";
+                            for (var c = n.firstChild; c; c = c.nextSibling)
+                                s += asXml(c);
+                            s += "</" + n.nodeName + ">";
+                        } else
+                            s += "/>";
+                    } else if (n.nodeType == 3)
+                        s += n.nodeValue;
+                    else if (n.nodeType == 4)
+                        s += "<![CDATA[" + n.nodeValue + "]]>";
+                    return s;
+                };
+                for (var c = node.firstChild; c; c = c.nextSibling)
+                    s += asXml(c);
+            }
+            return s;
+        },
+        escape: function (txt) {
+            return txt.replace(/[\\]/g, "\\\\")
+                    .replace(/[\"]/g, '\\"')
+                    .replace(/[\n]/g, '\\n')
+                    .replace(/[\r]/g, '\\r');
+        },
+        removeWhite: function (e) {
+            e.normalize();
+            for (var n = e.firstChild; n; ) {
+                if (n.nodeType == 3) {  // text node
+                    if (!n.nodeValue.match(/[^ \f\n\r\t\v]/)) { // pure whitespace text node
+                        var nxt = n.nextSibling;
+                        e.removeChild(n);
+                        n = nxt;
+                    } else
+                        n = n.nextSibling;
+                } else if (n.nodeType == 1) {  // element node
+                    X.removeWhite(n);
+                    n = n.nextSibling;
+                } else                      // any other node
+                    n = n.nextSibling;
+            }
+            return e;
+        }
+    };
+    if (xml.nodeType == 9) // document node
+        xml = xml.documentElement;
+    var json = X.toJson(X.toObj(X.removeWhite(xml)), xml.nodeName, "\t");
+    return "{\n" + tab + (tab ? json.replace(/\t/g, tab) : json.replace(/\t|\n/g, "")) + "\n}";
+}
+
+/*	This work is licensed under Creative Commons GNU LGPL License.
+ License: http://creativecommons.org/licenses/LGPL/2.1/
+ Version: 0.9
+ Author:  Stefan Goessner/2006
+ Web:     http://goessner.net/
+ */
+function json2xml(o, tab) {
+    var toXml = function (v, name, ind) {
+        var xml = "";
+        if (v instanceof Array) {
+            for (var i = 0, n = v.length; i < n; i++)
+                xml += ind + toXml(v[i], name, ind + "\t") + "\n";
+        } else if (typeof (v) == "object") {
+            var hasChild = false;
+            xml += ind + "<" + name;
+            for (var m in v) {
+                if (m.charAt(0) == "@")
+                    xml += " " + m.substr(1) + "=\"" + v[m].toString() + "\"";
+                else
+                    hasChild = true;
+            }
+            xml += hasChild ? ">" : "/>";
+            if (hasChild) {
+                for (var m in v) {
+                    if (m == "#text")
+                        xml += v[m];
+                    else if (m == "#cdata")
+                        xml += "<![CDATA[" + v[m] + "]]>";
+                    else if (m.charAt(0) != "@")
+                        xml += toXml(v[m], m, ind + "\t");
+                }
+                xml += (xml.charAt(xml.length - 1) == "\n" ? ind : "") + "</" + name + ">";
+            }
+        } else {
+            xml += ind + "<" + name + ">" + v.toString() + "</" + name + ">";
+        }
+        return xml;
+    }, xml = "";
+    for (var m in o)
+        xml += toXml(o[m], m, "");
+    return tab ? xml.replace(/\t/g, tab) : xml.replace(/\t|\n/g, "");
 }
 
